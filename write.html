@@ -49,7 +49,6 @@
 <div class="page-wrapper">
   <div class="write-page">
 
-    <!-- Password Gate -->
     <div class="gate" id="gate">
       <h2>admin access</h2>
       <input type="password" id="gate-input" placeholder="enter password" autocomplete="off"/>
@@ -57,7 +56,6 @@
       <p class="gate-error" id="gate-error">incorrect password.</p>
     </div>
 
-    <!-- Editor (hidden until password correct) -->
     <div class="editor" id="editor">
       <div class="write-header">
         <h1>Write a Post</h1>
@@ -89,7 +87,6 @@
 </div>
 
 <footer>© 2026 · Typewriter Tales · made with patience and coffee</footer>
-
 <div class="toast" id="toast"></div>
 <textarea id="ghost"></textarea>
 <script type="module">
@@ -108,34 +105,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-// ── Password Gate ──
-const ADMIN_PASSWORD = "typewriter"; // change this to your own password
-const gate      = document.getElementById("gate");
-const gateInput = document.getElementById("gate-input");
-const gateBtn   = document.getElementById("gate-btn");
-const gateError = document.getElementById("gate-error");
-const editor    = document.getElementById("editor");
-
-function unlock() {
-  if (gateInput.value === ADMIN_PASSWORD) {
-    gate.style.display = "none";
-    editor.style.display = "block";
-    ghost.focus();
-    render();
-  } else {
-    gateError.style.display = "block";
-    gateInput.value = "";
-    gateInput.focus();
-  }
-}
-
-gateBtn.addEventListener("click", unlock);
-gateInput.addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
-
-// ── Typewriter Editor ──
-let text = "";
-const MAX = 5000;
-
+// ── helpers ──
+const gate       = document.getElementById("gate");
+const gateInput  = document.getElementById("gate-input");
+const gateBtn    = document.getElementById("gate-btn");
+const gateError  = document.getElementById("gate-error");
+const editor     = document.getElementById("editor");
 const display    = document.getElementById("typed-display");
 const cursor     = document.getElementById("tw-cursor");
 const ghost      = document.getElementById("ghost");
@@ -148,12 +123,33 @@ const titleEl    = document.getElementById("post-title");
 const dateEl     = document.getElementById("post-date");
 const descEl     = document.getElementById("post-desc");
 
+const ADMIN_PASSWORD = "typewriter";
+let text = "";
+const MAX = 5000;
+
+// ── password gate ──
+function unlock() {
+  if (gateInput.value === ADMIN_PASSWORD) {
+    gate.style.display = "none";
+    editor.style.display = "block";
+    render();
+  } else {
+    gateError.style.display = "block";
+    gateInput.value = "";
+    gateInput.focus();
+  }
+}
+gateBtn.addEventListener("click", unlock);
+gateInput.addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+
+// ── toast ──
 function showToast(msg, dur = 3000) {
   toast.textContent = msg;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), dur);
 }
 
+// ── render paper ──
 function render() {
   while (display.firstChild !== cursor) display.removeChild(display.firstChild);
   if (text.length > 0) cursor.insertAdjacentText("beforebegin", text);
@@ -166,13 +162,19 @@ function shake() {
   display.classList.add("clack");
 }
 
+// ── paper focus — only when NOT typing in a real input ──
+function isTypingInInput() {
+  const a = document.activeElement;
+  return a && a !== ghost && (a.tagName === "INPUT" || a.tagName === "TEXTAREA");
+}
+
 paper.addEventListener("click", () => ghost.focus());
+
 ghost.addEventListener("blur", () => {
-  const active = document.activeElement;
-  const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA") && active !== ghost;
-  if (!isInput) setTimeout(() => ghost.focus(), 50);
+  if (!isTypingInInput()) setTimeout(() => ghost.focus(), 50);
 });
 
+// ── keystrokes go to paper ──
 ghost.addEventListener("keydown", e => {
   if (e.key === "Backspace") {
     e.preventDefault();
@@ -191,13 +193,22 @@ ghost.addEventListener("keydown", e => {
   }
 });
 
+// ── clicking title/date/desc removes focus from ghost properly ──
+[titleEl, dateEl, descEl].forEach(el => {
+  el.addEventListener("mousedown", e => e.stopPropagation());
+  el.addEventListener("focus", () => {
+    // ghost loses focus naturally — blur handler will see isTypingInInput() = true
+  });
+});
+
+// ── clear ──
 clearBtn.addEventListener("click", e => {
   e.stopPropagation();
   if (!text) return;
   if (confirm("Clear the page?")) { text = ""; render(); }
-  ghost.focus();
 });
 
+// ── publish ──
 publishBtn.addEventListener("click", async e => {
   e.stopPropagation();
   const trimmed = text.trim();
@@ -228,7 +239,6 @@ publishBtn.addEventListener("click", async e => {
 
   publishBtn.textContent = "publish post";
   publishBtn.disabled = false;
-  ghost.focus();
 });
 </script>
 
