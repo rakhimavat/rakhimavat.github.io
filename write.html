@@ -167,7 +167,11 @@ function shake() {
 }
 
 paper.addEventListener("click", () => ghost.focus());
-ghost.addEventListener("blur", () => setTimeout(() => ghost.focus(), 50));
+ghost.addEventListener("blur", () => {
+  const active = document.activeElement;
+  const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA") && active !== ghost;
+  if (!isInput) setTimeout(() => ghost.focus(), 50);
+});
 
 ghost.addEventListener("keydown", e => {
   if (e.key === "Backspace") {
