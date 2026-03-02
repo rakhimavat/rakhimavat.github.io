@@ -33,6 +33,7 @@
   </style>
 </head>
 <body>
+
 <nav>
   <a href="index.html" class="nav-logo">Typewriter Tales</a>
   <ul class="nav-links">
@@ -81,14 +82,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const postList = document.getElementById("post-list");
+const postList   = document.getElementById("post-list");
 const loadingMsg = document.getElementById("loading-msg");
-const overlay = document.getElementById("post-overlay");
-const overlayBack = document.getElementById("overlay-back");
-const overlayDate = document.getElementById("overlay-date");
+const overlay    = document.getElementById("post-overlay");
+const overlayBack  = document.getElementById("overlay-back");
+const overlayDate  = document.getElementById("overlay-date");
 const overlayTitle = document.getElementById("overlay-title");
-const overlayBody = document.getElementById("overlay-body");
-const twCursor = document.getElementById("tw-cursor");
+const overlayBody  = document.getElementById("overlay-body");
+const twCursor     = document.getElementById("tw-cursor");
 
 function formatDate(ts) {
   if (!ts) return "";
@@ -166,5 +167,6 @@ async function loadPosts() {
 
 loadPosts();
 </script>
+
 </body>
 </html>
