@@ -1,11 +1,212 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Typewriter Tales · Admin</title>
+  <title>Typewriter Tales</title>
+  "/>
+  <!-- Netlify Identity Widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* ── Hero ── */
+    .hero {
+      min-height: calc(100vh - 52px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px;
+      position: relative;
+    }
+    .hero-tagline {
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-family: 'Special Elite', serif;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      line-height: 1.15;
+      color: #2c2c2c;
+      margin-bottom: 20px;
+    }
+    /* typewriter auto-demo on hero */
+    .hero-subtitle {
+      font-size: 1rem;
+      color: #888;
+      min-height: 1.5em;
+      margin-bottom: 42px;
+    }
+    .hero-subtitle .tw-cursor {
+      display: inline-block;
+      width: 8px; height: 1em;
+      background: #aaa;
+      vertical-align: text-bottom;
+      margin-left: 2px;
+      animation: blink 0.8s step-end infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .hero-cta {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    /* ── Divider ── */
+    .divider {
+      width: 60px;
+      height: 1.5px;
+      background: #d4cdc0;
+      margin: 0 auto 64px;
+    }
+    /* ── Sections on home ── */
+    .sections {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .section-card {
+      background: #fdfaf3;
+      border: 1px solid #e0d9ce;
+      padding: 36px 30px;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.25s, transform 0.25s;
+      display: block;
+    }
+    .section-card:hover {
+      box-shadow: 4px 4px 0 #d4cdc0;
+      transform: translate(-2px, -2px);
+    }
+    .card-number {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: #bbb;
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-family: 'Special Elite', serif;
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      color: #2c2c2c;
+    }
+    .card-desc {
+      font-size: 0.82rem;
+      color: #888;
+      line-height: 1.7;
+    }
+    /* ── Scroll hint ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      color: #bbb;
+      animation: fadeUpDown 2s ease-in-out infinite;
+    }
+    @keyframes fadeUpDown {
+      0%,100% { transform: translateX(-50%) translateY(0); opacity: 0.5; }
+      50% { transform: translateX(-50%) translateY(-6px); opacity: 1; }
+    }
+    @media (max-width: 600px) {
+      .sections { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+
+<!-- Nav -->
+<nav>
+  <a href="index.html" class="nav-logo">Typewriter Tales</a>
+  <ul class="nav-links">
+    ><a href="index.html" class="active">home</a></li>
+    ><a href="blogs.html">blogs</a></li>
+    ><a href="typewriter.html">experience</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrapper">
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-tagline">a personal journal</p>
+    <h1 class="hero-title">Typewriter Tales</h1>
+    <p class="hero-subtitle">
+      <span id="hero-tw"></span><span class="tw-cursor"></span>
+    </p>
+    <div class="hero-cta">
+      <a href="blogs.html" class="btn">read the blog</a>
+      <a href="typewriter.html" class="btn btn-fill">try the typewriter</a>
+    </div>
+    <div class="scroll-hint">↓ scroll</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Section Cards -->
+  <div class="sections">
+    <a href="blogs.html" class="section-card">
+      <p class="card-number">01 ·</p>
+      <h2 class="card-title">The Blog</h2>
+      <p class="card-desc">Short stories, personal experiences, and little moments worth remembering.</p>
+    </a>
+    <a href="typewriter.html" class="section-card">
+      <p class="card-number">02 ·</p>
+      <h2 class="card-title">Experience the Typewriter</h2>
+      <p class="card-desc">Sit down. Start typing. Feel what it's like to write on a real typewriter — right in your browser.</p>
+    </a>
+  </div>
+</div>
+
+<footer>© 2026 · Typewriter Tales · made with patience and coffee</footer>
+
+<!-- Auto-typewriter in hero subtitle -->
+<script>
+  const phrases = [
+    "stories typed one key at a time.",
+    "small moments, written slowly.",
+    "because some things deserve to be typed.",
+    "a journal. no filter. just words."
+  ];
+  const el = document.getElementById('hero-tw');
+  let pi = 0, ci = 0, deleting = false;
+  function tick() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      el.textContent = phrase.slice(0, ++ci);
+      if (ci === phrase.length) { deleting = true; setTimeout(tick, 2000); return; }
+      setTimeout(tick, 65);
+    } else {
+      el.textContent = phrase.slice(0, --ci);
+      if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; setTimeout(tick, 400); return; }
+      setTimeout(tick, 35);
+    }
+  }
+  tick();
+</script>
+
+<!-- Netlify Identity redirect handler -->
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.href = "/Admin/";
+        });
+      }
+    });
+  }
+</script>
+
 </body>
 </html>
