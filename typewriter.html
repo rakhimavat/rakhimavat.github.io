@@ -171,9 +171,16 @@ function playClack() {
 }
 
 paper.addEventListener("click", () => ghost.focus());
-window.addEventListener("load", () => { ghost.focus(); render(); });
-ghost.addEventListener("blur", () => setTimeout(() => ghost.focus(), 50));
-
+window.addEventListener("load", () => {
+  render();
+  if (document.activeElement !== authorEl) ghost.focus();
+});
+ghost.addEventListener("blur", () => {
+  setTimeout(() => {
+    if (document.activeElement !== authorEl) ghost.focus();
+  }, 50);
+});
+  
 ghost.addEventListener("keydown", e => {
   if (e.key === "Backspace") {
     e.preventDefault();
