@@ -4,324 +4,936 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Promise Wall · Promises to Self</title>
+
   <style>
-    .wall-page {
-      max-width: 920px;
+    :root {
+      --cream: #f5f0e8;
+      --paper: #fffdf7;
+      --ink: #2c2c2c;
+      --muted: #8c8174;
+      --cork-dark: #6d4428;
+      --cork-mid: #8c5a36;
+      --cork-light: #b98051;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 1000;
+      height: 58px;
+      border-bottom: 1px solid #d8ccbd;
+      background: rgba(245, 240, 232, 0.96);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-inner {
+      max-width: 1180px;
+      height: 100%;
       margin: 0 auto;
-      padding: 56px 24px 100px;
-    }
-    .wall-header {
-      text-align: center;
-      margin-bottom: 52px;
-    }
-    .wall-header h1 {
-      font-family: 'Special Elite', serif;
-      font-size: 2.4rem;
-      margin-bottom: 12px;
-      color: #2c2c2c;
-    }
-    .wall-header p {
-      font-size: 0.88rem;
-      color: #888;
-      letter-spacing: 0.04em;
-      line-height: 1.6;
-      max-width: 540px;
-      margin: 0 auto;
-    }
-    .filter-bar {
+      padding: 0 24px;
       display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 40px;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
     }
-    .filter-btn {
-      font-family: 'Courier Prime', monospace;
-      font-size: 0.75rem;
+
+    .nav-logo {
+      color: var(--ink);
+      text-decoration: none;
+      font-family: "Special Elite", serif;
+      font-size: 1.08rem;
+      letter-spacing: 0.03em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.74rem;
       letter-spacing: 0.08em;
-      padding: 8px 18px;
-      border: 1px solid #d4cdc0;
-      background: #fdfaf3;
-      color: #888;
+    }
+
+    .nav-links a {
+      color: #807568;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--ink);
+    }
+
+    .wall-page {
+      padding-top: 58px;
+      min-height: 100vh;
+    }
+
+    .wall-intro {
+      max-width: 900px;
+      padding: 42px 24px 26px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .wall-intro h1 {
+      margin: 0 0 12px;
+      font-family: "Special Elite", serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    .wall-intro p {
+      max-width: 620px;
+      margin: 0 auto;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.84rem;
+      line-height: 1.75;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+
+    .wall-tools {
+      max-width: 1180px;
+      margin: 0 auto 14px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .promise-count,
+    .board-hint {
+      margin: 0;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.07em;
+      color: #998d7f;
+    }
+
+    .zoom-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .zoom-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #cfc1b0;
+      background: #fffdf8;
+      color: var(--ink);
       cursor: pointer;
-      transition: all 0.2s;
+      font-family: "Courier Prime", monospace;
+      font-size: 1rem;
+      line-height: 1;
+      transition: background 0.18s ease, transform 0.18s ease;
     }
-    .filter-btn:hover {
-      border-color: #aaa;
-      color: #2c2c2c;
+
+    .zoom-btn:hover {
+      background: var(--ink);
+      color: var(--cream);
+      transform: translateY(-1px);
     }
-    .filter-btn.active {
-      background: #2c2c2c;
-      color: #fdfaf3;
-      border-color: #2c2c2c;
+
+    .zoom-btn.reset {
+      width: auto;
+      padding: 0 11px;
+      font-size: 0.67rem;
+      letter-spacing: 0.06em;
+      text-transform: lowercase;
     }
-    .wall-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 28px;
-    }
-    .wall-card {
-      background: #fdfaf3;
-      border: 1px solid #e0d9ce;
-      padding: 36px 32px 28px 56px;
+
+    .board-viewport {
       position: relative;
-      background-image: linear-gradient(
-        #fdfaf3 0px, #fdfaf3 27px,
-        #e0d9ce 27px, #e0d9ce 28px
-      );
-      background-size: 100% 28px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      width: min(1180px, calc(100vw - 32px));
+      height: min(72vh, 760px);
+      min-height: 500px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 14px solid #50311e;
+      outline: 1px solid #b98357;
+      box-shadow:
+        0 10px 24px rgba(67, 42, 25, 0.22),
+        inset 0 0 0 3px rgba(255, 218, 172, 0.18);
+      background:
+        radial-gradient(circle at 14% 21%, rgba(255, 224, 175, 0.23) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 71% 38%, rgba(55, 27, 11, 0.18) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 32% 77%, rgba(255, 226, 181, 0.16) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 88% 84%, rgba(53, 28, 12, 0.16) 0 1px, transparent 1.6px),
+        repeating-linear-gradient(
+          115deg,
+          rgba(255,255,255,0.03) 0 2px,
+          transparent 2px 9px
+        ),
+        linear-gradient(135deg, var(--cork-light), var(--cork-mid) 45%, var(--cork-dark));
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
     }
-    .wall-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 4px 4px 0 #e0d9ce;
+
+    .board-viewport.dragging {
+      cursor: grabbing;
     }
-    .wall-card::before {
-      content: '';
+
+    .board-shadow-label {
       position: absolute;
+      z-index: 20;
+      left: 18px;
+      bottom: 14px;
+      color: rgba(255, 247, 235, 0.72);
+      font-family: "Courier Prime", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+
+    .board-scene {
+      position: absolute;
+      width: 1600px;
+      height: 1100px;
+      left: 50%;
+      top: 50%;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .board-scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.16) 0 1px, transparent 1.4px),
+        radial-gradient(circle at 76% 30%, rgba(40,20,8,0.15) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 32% 68%, rgba(255,255,255,0.12) 0 1px, transparent 1.2px),
+        radial-gradient(circle at 90% 80%, rgba(50,24,8,0.16) 0 1px, transparent 1.5px);
+      background-size: 88px 76px, 126px 104px, 156px 142px, 114px 126px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .promise-note {
+      --rotation: -2deg;
+      --paper-color: #fffdf7;
+      position: absolute;
+      width: 290px;
+      min-height: 230px;
+      padding: 32px 27px 22px;
+      border: 1px solid rgba(92, 70, 46, 0.22);
+      background:
+        linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 31px,
+          rgba(115, 152, 185, 0.17) 32px,
+          transparent 33px
+        ),
+        var(--paper-color);
+      background-size: 100% 33px;
+      box-shadow:
+        5px 8px 10px rgba(45, 25, 12, 0.36),
+        0 1px 0 rgba(255,255,255,0.55) inset;
+      clip-path: polygon(
+        1% 2%, 7% 0.4%, 16% 1.7%, 27% 0.3%, 37% 1.8%,
+        49% 0.5%, 61% 1.9%, 74% 0.4%, 87% 1.5%, 99% 0.6%,
+        98.5% 11%, 100% 22%, 98.2% 34%, 99.8% 46%, 98.4% 58%,
+        100% 70%, 98.1% 82%, 99% 98%, 87% 99.2%, 76% 98.1%,
+        64% 99.6%, 51% 98.2%, 39% 99.5%, 27% 98.1%, 15% 99.3%,
+        2% 98%, 0.7% 86%, 1.9% 73%, 0.3% 61%, 1.8% 49%,
+        0.4% 37%, 1.7% 24%, 0.4% 13%
+      );
+      transform: rotate(var(--rotation));
+      transform-origin: center;
+      cursor: pointer;
+      transition:
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    .promise-note:hover {
+      z-index: 50 !important;
+      box-shadow:
+        8px 12px 15px rgba(45, 25, 12, 0.42),
+        0 1px 0 rgba(255,255,255,0.55) inset;
+      filter: brightness(1.025);
+    }
+
+    .promise-note::before {
+      content: "";
+      position: absolute;
+      left: 20px;
       top: 0;
       bottom: 0;
-      left: 44px;
       width: 1px;
-      background: #f0b0a8;
-      opacity: 0.6;
+      background: rgba(206, 105, 92, 0.36);
+      pointer-events: none;
     }
-    .card-text {
-      font-family: 'Courier Prime', monospace;
+
+    .promise-note::after {
+      content: "";
+      position: absolute;
+      width: 17px;
+      height: 17px;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.72) 0 13%, transparent 15%),
+        var(--pin-color, #ae2d25);
+      box-shadow:
+        0 2px 2px rgba(48, 24, 12, 0.45),
+        inset -2px -2px 2px rgba(74, 14, 10, 0.28);
+      pointer-events: none;
+    }
+
+    .note-text {
+      position: relative;
+      z-index: 1;
+      max-height: 147px;
+      overflow: hidden;
+      margin: 0;
+      padding-left: 10px;
+      color: var(--note-ink, #2c2c2c);
+      font-family: "Courier Prime", monospace;
       font-size: 0.92rem;
-      line-height: 28px;
+      line-height: 33px;
       white-space: pre-wrap;
       word-break: break-word;
-      min-height: 64px;
+      text-shadow: 0 0 0.2px currentColor;
     }
-    .card-meta {
+
+    .note-text::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 36px;
+      background: linear-gradient(transparent, var(--paper-color));
+      pointer-events: none;
+    }
+
+    .note-meta {
+      position: absolute;
+      z-index: 2;
+      left: 27px;
+      right: 27px;
+      bottom: 19px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
-      padding-top: 14px;
-      border-top: 1px solid #e8e2d8;
-      font-size: 0.7rem;
-      color: #bbb;
-      letter-spacing: 0.06em;
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(95, 75, 53, 0.16);
+      color: rgba(76, 66, 56, 0.58);
+      font-family: "Courier Prime", monospace;
+      font-size: 0.61rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      overflow: hidden;
     }
-    .card-ribbon {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      border: 2px solid rgba(0,0,0,0.2);
+
+    .note-meta span {
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+
+    .note-tape {
+      position: absolute;
+      top: -11px;
+      right: 20px;
+      width: 76px;
+      height: 25px;
+      opacity: 0.78;
+      transform: rotate(5deg);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,0.08) 0 2px,
+          rgba(0,0,0,0.03) 2px 4px
+        ),
+        rgba(229, 209, 121, 0.76);
+      box-shadow: 0 1px 2px rgba(40, 28, 16, 0.18);
+    }
+
     .state-msg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(430px, calc(100% - 48px));
+      transform: translate(-50%, -50%);
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(70, 40, 22, 0.48);
+      color: #fff7e9;
       text-align: center;
-      padding: 80px 24px;
-      font-size: 0.85rem;
-      color: #bbb;
-      letter-spacing: 0.06em;
-      grid-column: 1 / -1;
-    }
-    .write-cta {
-      text-align: center;
-      margin-top: 52px;
-      padding-top: 32px;
-      border-top: 1px solid #e0d9ce;
-    }
-    .write-cta a {
-      color: #888;
-      text-decoration: none;
+      font-family: "Courier Prime", monospace;
       font-size: 0.82rem;
-      letter-spacing: 0.06em;
-      border-bottom: 1px solid #ddd;
-      transition: color 0.2s;
+      line-height: 1.55;
+      letter-spacing: 0.04em;
     }
-    .write-cta a:hover {
-      color: #2c2c2c;
-    }
-    .promise-count {
+
+    .write-cta {
+      padding: 26px 24px 14px;
       text-align: center;
-      font-size: 0.75rem;
-      color: #aaa;
-      letter-spacing: 0.08em;
-      margin-bottom: 24px;
     }
-    @media (max-width: 600px) {
-      .wall-grid {
-        grid-template-columns: 1fr;
+
+    .write-cta a {
+      color: #776b5e;
+      border-bottom: 1px solid #c8b9a7;
+      text-decoration: none;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .write-cta a:hover {
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+
+    footer {
+      margin-top: 34px;
+      padding: 28px 20px;
+      border-top: 1px solid #ded3c6;
+      color: #a1968a;
+      text-align: center;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+    }
+
+    .promise-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(30, 20, 13, 0.72);
+      backdrop-filter: blur(4px);
+    }
+
+    .promise-modal.open {
+      display: flex;
+    }
+
+    .modal-note {
+      --modal-ink: #2c2c2c;
+      position: relative;
+      width: min(620px, 100%);
+      max-height: min(76vh, 760px);
+      overflow: auto;
+      padding: 66px 56px 44px 74px;
+      color: var(--modal-ink);
+      background:
+        linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 33px,
+          rgba(115, 152, 185, 0.18) 34px,
+          transparent 35px
+        ),
+        #fffdf7;
+      background-size: 100% 35px;
+      box-shadow: 14px 18px 40px rgba(0,0,0,0.42);
+      clip-path: polygon(
+        1% 1%, 9% 0.3%, 19% 1.5%, 29% 0.2%, 41% 1.5%,
+        53% 0.2%, 66% 1.4%, 79% 0.3%, 91% 1.6%, 99% 0.5%,
+        98.6% 15%, 100% 29%, 98.5% 43%, 99.7% 57%, 98.3% 70%,
+        99.8% 85%, 98.6% 99%, 84% 98.3%, 70% 99.5%, 55% 98.1%,
+        40% 99.4%, 25% 98.2%, 12% 99.5%, 1% 98.3%, 1.6% 83%,
+        0.2% 68%, 1.5% 53%, 0.3% 38%, 1.7% 24%, 0.4% 11%
+      );
+    }
+
+    .modal-note::before {
+      content: "";
+      position: absolute;
+      left: 51px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(206, 105, 92, 0.42);
+    }
+
+    .modal-pin {
+      position: absolute;
+      top: 17px;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: var(--modal-pin, #ae2d25);
+      box-shadow:
+        0 3px 3px rgba(48,24,12,0.45),
+        inset -2px -2px 2px rgba(74,14,10,0.28);
+    }
+
+    .modal-close {
+      position: absolute;
+      z-index: 2;
+      top: 18px;
+      right: 22px;
+      border: 0;
+      background: transparent;
+      color: #746759;
+      cursor: pointer;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+    }
+
+    .modal-close:hover {
+      color: var(--ink);
+    }
+
+    .modal-text {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      padding-left: 9px;
+      font-family: "Courier Prime", monospace;
+      font-size: clamp(0.95rem, 2.1vw, 1.08rem);
+      line-height: 35px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .modal-meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 30px;
+      padding: 15px 0 0 9px;
+      border-top: 1px solid rgba(95, 75, 53, 0.18);
+      color: #817467;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 700px) {
+      .wall-intro {
+        padding-top: 30px;
       }
-      .wall-card {
-        padding: 32px 24px 24px 48px;
+
+      .wall-tools {
+        align-items: flex-start;
+        flex-direction: column;
       }
-      .wall-card::before {
-        left: 36px;
+
+      .board-hint {
+        display: none;
+      }
+
+      .board-viewport {
+        width: calc(100vw - 20px);
+        min-height: 560px;
+        height: 70vh;
+        border-width: 9px;
+      }
+
+      .nav-inner {
+        padding: 0 15px;
+      }
+
+      .nav-links {
+        gap: 12px;
+      }
+
+      .board-scene {
+        width: 1600px;
+        height: 1100px;
+      }
+
+      .modal-note {
+        padding: 62px 28px 34px 54px;
+      }
+
+      .modal-note::before {
+        left: 35px;
       }
     }
   </style>
 </head>
+
 <body>
-
-<nav style="border-bottom:1px solid #e8e2d8;background:#f5f0e8;margin-bottom:0">
-  <div style="max-width:780px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between">
-    <a href="index.html" style="font-family:'Special Elite',serif;font-size:1.1rem;color:#2c2c2c;text-decoration:none">Promises to Self</a>
-    <div style="font-size:.75rem;color:#aaa;letter-spacing:.08em">
-      <a href="index.html" style="color:#888;text-decoration:none">write</a>
-      &nbsp;·&nbsp;
-      <a href="wall.html" style="color:#888;text-decoration:none">the wall</a>
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Promises to Self</a>
+      <div class="nav-links">
+        <a href="index.html">write</a>
+        <a href="wall.html" class="active">the wall</a>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<div class="page-wrapper">
-  <div class="wall-page">
-    <div class="wall-header">
+  <main class="wall-page">
+    <section class="wall-intro">
       <h1>The Promise Wall</h1>
-      <p>Promises people have made to themselves. Read them. Be inspired. Keep your own.</p>
+      <p>
+        A board full of promises people made quietly to themselves.
+        Zoom out to take it all in. Move closer when one catches your eye.
+      </p>
+    </section>
+
+    <div class="wall-tools">
+      <p class="promise-count" id="promise-count">loading promises...</p>
+
+      <div class="zoom-controls" aria-label="Wall zoom controls">
+        <button class="zoom-btn" id="zoom-out" type="button" aria-label="Zoom out">−</button>
+        <button class="zoom-btn reset" id="zoom-reset" type="button">reset</button>
+        <button class="zoom-btn" id="zoom-in" type="button" aria-label="Zoom in">+</button>
+      </div>
+
+      <p class="board-hint">scroll to zoom · drag to explore · click a note to read</p>
     </div>
 
-    <div class="filter-bar" id="filter-bar">
-      <button class="filter-btn active" data-filter="all">all promises</button>
-      <button class="filter-btn" data-filter="health">health & wellness</button>
-      <button class="filter-btn" data-filter="growth">growth & learning</button>
-      <button class="filter-btn" data-filter="relationships">relationships</button>
-      <button class="filter-btn" data-filter="career">career & work</button>
-      <button class="filter-btn" data-filter="other">other</button>
-    </div>
-
-    <p class="promise-count" id="promise-count">loading...</p>
-
-    <div class="wall-grid" id="wall-grid">
-      <p class="state-msg" id="state-msg">loading the wall...</p>
-    </div>
+    <section class="board-viewport" id="board-viewport" aria-label="Interactive promise board">
+      <div class="board-scene" id="board-scene"></div>
+      <p class="state-msg" id="state-msg">loading the promise wall...</p>
+      <span class="board-shadow-label">Promises to Self</span>
+    </section>
 
     <div class="write-cta">
-      <a href="index.html">make your own promise →</a>
+      <a href="index.html">make a promise of your own →</a>
     </div>
-  </div>
-</div>
+  </main>
 
-<footer>© 2026 · Promises to Self · made with patience and coffee</footer>
+  <footer>© 2026 · Promises to Self · made with patience and coffee</footer>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBPnZ8f4cek3JcIwfopsmxnCAGTXoH--yc",
-  authDomain: "typewritertales-5bdda.firebaseapp.com",
-  projectId: "typewritertales-5bdda",
-  storageBucket: "typewritertales-5bdda.firebasestorage.app",
-  messagingSenderId: "631041179526",
-  appId: "1:631041179526:web:7d2fea0e3a5b48ce567607"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const grid = document.getElementById('wall-grid');
-const msg  = document.getElementById('state-msg');
-const countEl = document.getElementById('promise-count');
-const filterBar = document.getElementById('filter-bar');
-
-let allPromises = [];
-
-function formatDate(ts) {
-  if (!ts) return '';
-  const d = ts.toDate();
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function inferCategory(text) {
-  const t = text.toLowerCase();
-  if (t.includes('gym') || t.includes('run') || t.includes('yoga') || t.includes('meditate') || t.includes('sleep') || t.includes('eat') || t.includes('drink') || t.includes('exercise') || t.includes('workout')) return 'health';
-  if (t.includes('read') || t.includes('learn') || t.includes('course') || t.includes('skill') || t.includes('study') || t.includes('practice')) return 'growth';
-  if (t.includes('family') || t.includes('friend') || t.includes('call') || t.includes('visit') || t.includes('love') || t.includes('partner') || t.includes('parent')) return 'relationships';
-  if (t.includes('job') || t.includes('work') || t.includes('career') || t.includes('project') || t.includes('business') || t.includes('promot')) return 'career';
-  return 'other';
-}
-
-function renderPromises(filter = 'all') {
-  grid.innerHTML = '';
-  
-  const filtered = filter === 'all' 
-    ? allPromises 
-    : allPromises.filter(p => p.category === filter);
-  
-  countEl.textContent = `${filtered.length} promise${filtered.length !== 1 ? 's' : ''}`;
-  
-  if (filtered.length === 0) {
-    msg.textContent = filter === 'all' 
-      ? 'nothing here yet. be the first to make a promise.' 
-      : `no promises in "${filter}" yet.`;
-    grid.appendChild(msg);
-    return;
-  }
-  
-  msg.remove();
-  filtered.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'wall-card';
-    card.innerHTML = `
-      <p class="card-text" style="color:${p.inkColor || '#2c2c2c'}">${escapeHtml(p.text)}</p>
-      <div class="card-meta">
-        <span>${escapeHtml(p.author || 'anonymous')}</span>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="card-ribbon" style="background:${p.inkColor || '#2c2c2c'}"></span>
-          <span>${formatDate(p.createdAt)}</span>
-        </div>
+  <div class="promise-modal" id="promise-modal" role="dialog" aria-modal="true" aria-label="Promise details">
+    <article class="modal-note" id="modal-note">
+      <span class="modal-pin" id="modal-pin"></span>
+      <button class="modal-close" id="modal-close" type="button">close ×</button>
+      <p class="modal-text" id="modal-text"></p>
+      <div class="modal-meta">
+        <span id="modal-author"></span>
+        <span id="modal-date"></span>
       </div>
-    `;
-    grid.appendChild(card);
-  });
-}
+    </article>
+  </div>
 
-async function loadWall() {
-  try {
-    const q = query(
-      collection(db, 'submissions'),
-      orderBy('createdAt', 'desc'),
-      limit(100)
-    );
-    const snap = await getDocs(q);
-    if (snap.empty) {
-      msg.textContent = 'nothing here yet. be the first to make a promise.';
-      countEl.textContent = '0 promises';
-      return;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      orderBy,
+      query,
+      limit
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPnZ8f4cek3JcIwfopsmxnCAGTXoH--yc",
+      authDomain: "typewritertales-5bdda.firebaseapp.com",
+      projectId: "typewritertales-5bdda",
+      storageBucket: "typewritertales-5bdda.firebasestorage.app",
+      messagingSenderId: "631041179526",
+      appId: "1:631041179526:web:7d2fea0e3a5b48ce567607"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const viewport = document.getElementById("board-viewport");
+    const scene = document.getElementById("board-scene");
+    const stateMsg = document.getElementById("state-msg");
+    const countEl = document.getElementById("promise-count");
+
+    const zoomInBtn = document.getElementById("zoom-in");
+    const zoomOutBtn = document.getElementById("zoom-out");
+    const resetBtn = document.getElementById("zoom-reset");
+
+    const modal = document.getElementById("promise-modal");
+    const modalNote = document.getElementById("modal-note");
+    const modalPin = document.getElementById("modal-pin");
+    const modalText = document.getElementById("modal-text");
+    const modalAuthor = document.getElementById("modal-author");
+    const modalDate = document.getElementById("modal-date");
+    const modalClose = document.getElementById("modal-close");
+
+    const sceneWidth = 1600;
+    const sceneHeight = 1100;
+    const colors = ["#ae2d25", "#285a93", "#2d6a4f", "#6d3fa0", "#b8751c"];
+    const paperColors = ["#fffdf7", "#fff9df", "#f7fbff", "#fff4ed", "#f8fff0"];
+
+    let scale = 0.48;
+    let translateX = 0;
+    let translateY = 0;
+    let isDragging = false;
+    let moved = false;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let translateStartX = 0;
+    let translateStartY = 0;
+    let promises = [];
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
-    allPromises = snap.docs.map(doc => {
-      const d = doc.data();
-      return {
-        text: d.text,
-        author: d.author || 'anonymous',
-        inkColor: d.inkColor || '#2c2c2c',
-        category: d.category || inferCategory(d.text),
-        createdAt: d.createdAt
-      };
+
+    function formatDate(timestamp) {
+      if (!timestamp || !timestamp.toDate) return "just now";
+      return timestamp.toDate().toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    function hashString(value) {
+      let hash = 0;
+      const text = String(value || "");
+      for (let i = 0; i < text.length; i++) {
+        hash = ((hash << 5) - hash) + text.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash);
+    }
+
+    function randomFromSeed(seed) {
+      const x = Math.sin(seed * 999) * 10000;
+      return x - Math.floor(x);
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function updateScene() {
+      scene.style.transform =
+        `translate(calc(-50% + ${translateX}px), calc(-50% + ${translateY}px)) scale(${scale})`;
+    }
+
+    function fitBoard() {
+      const rect = viewport.getBoundingClientRect();
+      scale = Math.min((rect.width - 55) / sceneWidth, (rect.height - 55) / sceneHeight);
+      scale = clamp(scale, 0.28, 0.62);
+      translateX = 0;
+      translateY = 0;
+      updateScene();
+    }
+
+    function changeZoom(delta, focalX, focalY) {
+      const previousScale = scale;
+      scale = clamp(scale + delta, 0.28, 1.7);
+
+      if (focalX !== undefined && focalY !== undefined) {
+        const rect = viewport.getBoundingClientRect();
+        const offsetX = focalX - rect.left - rect.width / 2;
+        const offsetY = focalY - rect.top - rect.height / 2;
+        const ratio = scale / previousScale;
+
+        translateX = offsetX - (offsetX - translateX) * ratio;
+        translateY = offsetY - (offsetY - translateY) * ratio;
+      }
+
+      updateScene();
+    }
+
+    function openPromise(promise) {
+      modalNote.style.setProperty("--modal-ink", promise.inkColor || "#2c2c2c");
+      modalPin.style.setProperty("--modal-pin", promise.pinColor || "#ae2d25");
+      modalText.textContent = promise.text;
+      modalAuthor.textContent = promise.author || "anonymous";
+      modalDate.textContent = formatDate(promise.createdAt);
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePromise() {
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    function createNote(promise, index) {
+      const seed = hashString(`${promise.id}-${index}-${promise.text}`);
+      const note = document.createElement("article");
+
+      const noteWidth = 260 + Math.round(randomFromSeed(seed + 1) * 70);
+      const noteHeight = 215 + Math.round(randomFromSeed(seed + 2) * 90);
+      const x = 55 + Math.round(randomFromSeed(seed + 3) * (sceneWidth - noteWidth - 110));
+      const y = 45 + Math.round(randomFromSeed(seed + 4) * (sceneHeight - noteHeight - 90));
+      const rotation = -7 + randomFromSeed(seed + 5) * 14;
+      const zIndex = 5 + index;
+
+      promise.pinColor = colors[Math.floor(randomFromSeed(seed + 6) * colors.length)];
+
+      note.className = "promise-note";
+      note.tabIndex = 0;
+      note.setAttribute("role", "button");
+      note.setAttribute("aria-label", `Read promise by ${promise.author || "anonymous"}`);
+      note.style.width = `${noteWidth}px`;
+      note.style.minHeight = `${noteHeight}px`;
+      note.style.left = `${x}px`;
+      note.style.top = `${y}px`;
+      note.style.zIndex = zIndex;
+      note.style.setProperty("--rotation", `${rotation.toFixed(1)}deg`);
+      note.style.setProperty("--paper-color", paperColors[Math.floor(randomFromSeed(seed + 7) * paperColors.length)]);
+      note.style.setProperty("--note-ink", promise.inkColor || "#2c2c2c");
+      note.style.setProperty("--pin-color", promise.pinColor);
+
+      const tape = randomFromSeed(seed + 8) > 0.54
+        ? '<span class="note-tape" aria-hidden="true"></span>'
+        : "";
+
+      note.innerHTML = `
+        ${tape}
+        <p class="note-text">${escapeHtml(promise.text)}</p>
+        <div class="note-meta">
+          <span>${escapeHtml(promise.author || "anonymous")}</span>
+          <span>${formatDate(promise.createdAt)}</span>
+        </div>
+      `;
+
+      note.addEventListener("click", event => {
+        if (moved) return;
+        event.stopPropagation();
+        openPromise(promise);
+      });
+
+      note.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openPromise(promise);
+        }
+      });
+
+      return note;
+    }
+
+    function renderBoard() {
+      scene.innerHTML = "";
+
+      promises.forEach((promise, index) => {
+        scene.appendChild(createNote(promise, index));
+      });
+
+      countEl.textContent =
+        `${promises.length} promise${promises.length === 1 ? "" : "s"} pinned to the board`;
+
+      fitBoard();
+    }
+
+    async function loadWall() {
+      try {
+        const q = query(
+          collection(db, "submissions"),
+          orderBy("createdAt", "desc"),
+          limit(120)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          stateMsg.textContent = "The board is waiting for its first promise.";
+          countEl.textContent = "0 promises pinned to the board";
+          return;
+        }
+
+        promises = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        stateMsg.remove();
+        renderBoard();
+      } catch (error) {
+        console.error("Could not load promise wall:", error);
+        stateMsg.textContent = "Could not load the wall. Please try again later.";
+        countEl.textContent = "";
+      }
+    }
+
+    viewport.addEventListener("wheel", event => {
+      event.preventDefault();
+      const direction = event.deltaY < 0 ? 0.08 : -0.08;
+      changeZoom(direction, event.clientX, event.clientY);
+    }, { passive: false });
+
+    viewport.addEventListener("pointerdown", event => {
+      if (event.target.closest(".promise-note")) return;
+
+      isDragging = true;
+      moved = false;
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
+      translateStartX = translateX;
+      translateStartY = translateY;
+      viewport.classList.add("dragging");
+      viewport.setPointerCapture(event.pointerId);
     });
-    msg.remove();
-    renderPromises();
-  } catch(e) {
-    msg.textContent = 'could not load the wall. try again later.';
-    countEl.textContent = '';
-  }
-}
 
-filterBar.addEventListener('click', e => {
-  if (e.target.classList.contains('filter-btn')) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    renderPromises(e.target.dataset.filter);
-  }
-});
+    viewport.addEventListener("pointermove", event => {
+      if (!isDragging) return;
 
-loadWall();
-</script>
+      const dx = event.clientX - pointerStartX;
+      const dy = event.clientY - pointerStartY;
 
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+
+      translateX = translateStartX + dx;
+      translateY = translateStartY + dy;
+      updateScene();
+    });
+
+    function stopDrag(event) {
+      if (!isDragging) return;
+      isDragging = false;
+      viewport.classList.remove("dragging");
+
+      if (viewport.hasPointerCapture(event.pointerId)) {
+        viewport.releasePointerCapture(event.pointerId);
+      }
+
+      setTimeout(() => { moved = false; }, 0);
+    }
+
+    viewport.addEventListener("pointerup", stopDrag);
+    viewport.addEventListener("pointercancel", stopDrag);
+
+    zoomInBtn.addEventListener("click", () => changeZoom(0.14));
+    zoomOutBtn.addEventListener("click", () => changeZoom(-0.14));
+    resetBtn.addEventListener("click", fitBoard);
+    window.addEventListener("resize", fitBoard);
+
+    modalClose.addEventListener("click", closePromise);
+
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closePromise();
+    });
+
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape") closePromise();
+    });
+
+    loadWall();
+  </script>
 </body>
 </html>
