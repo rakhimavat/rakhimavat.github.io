@@ -39,6 +39,20 @@
     .btn:hover{background:#2c2c2c;color:#f5f0e8}
     .btn-fill{background:#2c2c2c;color:#f5f0e8}
     .btn-fill:hover{background:transparent;color:#2c2c2c}
+
+    .navigation-signout{
+      padding:0;
+      border:none;
+      background:transparent;
+      color:#888;
+      font:inherit;
+      letter-spacing:inherit;
+      cursor:pointer;
+    }
+
+    .navigation-signout:hover{color:#2c2c2c}
+    .navigation-signout:disabled{opacity:.6;cursor:wait}
+
     @media (max-width:600px){.paper{padding:36px 20px 36px 44px}.paper::before{left:32px}}
   </style>
 </head>
@@ -51,6 +65,12 @@
       <a href="index.html" style="color:#888;text-decoration:none">write</a>
       &nbsp;·&nbsp;
       <a href="wall.html" style="color:#888;text-decoration:none">the wall</a>
+      &nbsp;·&nbsp;
+      <button
+        class="navigation-signout"
+        id="logout-button"
+        type="button"
+      >sign out</button>
     </div>
   </div>
 </nav>
@@ -99,36 +119,50 @@
 <div class="toast" id="toast"></div>
 <button class="sound-btn" id="sound-btn">🔇</button>
 <textarea id="ghost"></textarea>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import {
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBPnZ8f4cek3JcIwfopsmxnCAGTXoH--yc",
-  authDomain: "typewritertales-5bdda.firebaseapp.com",
-  projectId: "typewritertales-5bdda",
-  storageBucket: "typewritertales-5bdda.firebasestorage.app",
-  messagingSenderId: "631041179526",
-  appId: "1:631041179526:web:7d2fea0e3a5b48ce567607"
-};
+import {
+  db,
+  requireSignIn,
+  logOut
+} from "./auth.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+await requireSignIn();
 
 let text = "", inkColor = "#2c2c2c", soundOn = false;
 const MAX = 1000;
 
-const display  = document.getElementById("typed-display");
-const cursor   = document.getElementById("tw-cursor");
-const ghost    = document.getElementById("ghost");
-const paper    = document.getElementById("paper");
-const charCount  = document.getElementById("char-count");
-const soundBtn   = document.getElementById("sound-btn");
-const clearBtn   = document.getElementById("clear-btn");
-const copyBtn    = document.getElementById("copy-btn");
-const submitBtn  = document.getElementById("submit-btn");
-const toast      = document.getElementById("toast");
-const authorEl   = document.getElementById("author-name");
+const display = document.getElementById("typed-display");
+const cursor = document.getElementById("tw-cursor");
+const ghost = document.getElementById("ghost");
+const paper = document.getElementById("paper");
+const charCount = document.getElementById("char-count");
+const soundBtn = document.getElementById("sound-btn");
+const clearBtn = document.getElementById("clear-btn");
+const copyBtn = document.getElementById("copy-btn");
+const submitBtn = document.getElementById("submit-btn");
+const toast = document.getElementById("toast");
+const authorEl = document.getElementById("author-name");
+const logoutButton = document.getElementById("logout-button");
+
+logoutButton.addEventListener("click", async e => {
+  e.stopPropagation();
+  logoutButton.disabled = true;
+
+  try {
+    await logOut();
+  } catch (error) {
+    console.error("Sign-out failed:", error);
+    showToast("Could not sign out. Please try again.");
+    logoutButton.disabled = false;
+  }
+});
 
 function showToast(msg, dur = 3000) {
   toast.textContent = msg;
@@ -137,8 +171,14 @@ function showToast(msg, dur = 3000) {
 }
 
 function render() {
-  while (display.firstChild !== cursor) display.removeChild(display.firstChild);
-  if (text.length > 0) cursor.insertAdjacentText("beforebegin", text);
+  while (display.firstChild !== cursor) {
+    display.removeChild(display.firstChild);
+  }
+
+  if (text.length > 0) {
+    cursor.insertAdjacentText("beforebegin", text);
+  }
+
   display.style.color = inkColor;
   cursor.style.background = inkColor;
   charCount.textContent = text.length;
@@ -151,22 +191,41 @@ function shake() {
 }
 
 let audioCtx = null;
+
 function getAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!audioCtx) {
+    audioCtx = new (
+      window.AudioContext || window.webkitAudioContext
+    )();
+  }
+
   return audioCtx;
 }
 
 function playClack() {
   if (!soundOn) return;
+
   try {
     const ctx = getAudio();
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate);
+    const buf = ctx.createBuffer(
+      1,
+      ctx.sampleRate * 0.04,
+      ctx.sampleRate
+    );
+
     const d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.008));
+
+    for (let i = 0; i < d.length; i++) {
+      d[i] = (Math.random() * 2 - 1)
+        * Math.exp(-i / (ctx.sampleRate * 0.008));
+    }
+
     const src = ctx.createBufferSource();
     src.buffer = buf;
+
     const g = ctx.createGain();
     g.gain.value = 0.18;
+
     src.connect(g);
     g.connect(ctx.destination);
     src.start();
@@ -174,27 +233,56 @@ function playClack() {
 }
 
 paper.addEventListener("click", () => ghost.focus());
-window.addEventListener("load", () => {
+
+function initializeEditor() {
   render();
-  if (document.activeElement !== authorEl) ghost.focus();
-});
+
+  if (document.activeElement !== authorEl) {
+    ghost.focus();
+  }
+}
+
+// The sign-in check may finish after the window load event.
+if (document.readyState === "complete") {
+  initializeEditor();
+} else {
+  window.addEventListener("load", initializeEditor, { once: true });
+}
+
 ghost.addEventListener("blur", () => {
   setTimeout(() => {
-    if (document.activeElement !== authorEl) ghost.focus();
+    if (document.activeElement !== authorEl) {
+      ghost.focus();
+    }
   }, 50);
 });
-  
+
 ghost.addEventListener("keydown", e => {
   if (e.key === "Backspace") {
     e.preventDefault();
-    if (text.length > 0) { text = text.slice(0, -1); playClack(); shake(); render(); }
+
+    if (text.length > 0) {
+      text = text.slice(0, -1);
+      playClack();
+      shake();
+      render();
+    }
+
     return;
   }
+
   if (e.key === "Enter") {
     e.preventDefault();
-    if (text.length < MAX) { text += "\n"; shake(); render(); }
+
+    if (text.length < MAX) {
+      text += "\n";
+      shake();
+      render();
+    }
+
     return;
   }
+
   if (e.key.length === 1 && text.length < MAX) {
     text += e.key;
     playClack();
@@ -206,7 +294,11 @@ ghost.addEventListener("keydown", e => {
 document.querySelectorAll(".color-dot").forEach(dot => {
   dot.addEventListener("click", e => {
     e.stopPropagation();
-    document.querySelectorAll(".color-dot").forEach(d => d.classList.remove("active"));
+
+    document.querySelectorAll(".color-dot").forEach(d => {
+      d.classList.remove("active");
+    });
+
     dot.classList.add("active");
     inkColor = dot.dataset.color;
     render();
@@ -218,33 +310,54 @@ soundBtn.addEventListener("click", e => {
   e.stopPropagation();
   soundOn = !soundOn;
   soundBtn.textContent = soundOn ? "🔊" : "🔇";
+
   if (soundOn) getAudio();
+
   ghost.focus();
 });
 
 clearBtn.addEventListener("click", e => {
   e.stopPropagation();
+
   if (!text) return;
-  if (confirm("Clear your promise?")) { text = ""; render(); }
+
+  if (confirm("Clear your promise?")) {
+    text = "";
+    render();
+  }
+
   ghost.focus();
 });
 
 copyBtn.addEventListener("click", e => {
   e.stopPropagation();
+
   if (!text) return;
+
   navigator.clipboard.writeText(text).then(() => {
     copyBtn.textContent = "copied!";
-    setTimeout(() => copyBtn.textContent = "copy", 2000);
+
+    setTimeout(() => {
+      copyBtn.textContent = "copy";
+    }, 2000);
   });
+
   ghost.focus();
 });
 
 submitBtn.addEventListener("click", async e => {
   e.stopPropagation();
+
   const trimmed = text.trim();
-  if (!trimmed) { showToast("write your promise first."); return; }
+
+  if (!trimmed) {
+    showToast("write your promise first.");
+    return;
+  }
+
   submitBtn.textContent = "publishing...";
   submitBtn.disabled = true;
+
   try {
     await addDoc(collection(db, "submissions"), {
       text: trimmed,
@@ -253,13 +366,16 @@ submitBtn.addEventListener("click", async e => {
       category: "promise",
       createdAt: serverTimestamp()
     });
+
     showToast("your promise is on the wall!");
+
     text = "";
     render();
     authorEl.value = "";
   } catch(err) {
     showToast("something went wrong. try again.");
   }
+
   submitBtn.textContent = "publish promise";
   submitBtn.disabled = false;
   ghost.focus();
