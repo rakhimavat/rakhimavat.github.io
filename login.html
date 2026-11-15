@@ -110,6 +110,29 @@
       overflow-wrap: anywhere;
     }
 
+    .email-confirmation {
+      margin: 0;
+      color: #917a64;
+    }
+
+    .reflection {
+      margin-top: 24px;
+      padding-top: 22px;
+      border-top: 1px solid #e6d9c8;
+    }
+
+    .reflection-intro {
+      margin: 0 0 10px;
+      color: #917a64;
+    }
+
+    .reflection-question {
+      margin: 0;
+      color: #795e46;
+      font-size: 0.95rem;
+      line-height: 1.85;
+    }
+
     .footnote {
       margin: 22px 0 0;
       text-align: center;
@@ -148,7 +171,7 @@
         </button>
       </form>
 
-      <p id="message" role="status" aria-live="polite"></p>
+      <div id="message" role="status" aria-live="polite"></div>
     </section>
 
     <p class="footnote">
@@ -202,6 +225,29 @@
       try {
         localStorage.removeItem("emailForSignIn");
       } catch {}
+    }
+
+    function showEmailSentMessage() {
+      const confirmation = document.createElement("p");
+      confirmation.className = "email-confirmation";
+      confirmation.textContent =
+        "Your sign-in link is on its way. Check your inbox, or your spam folder if you don't see it.";
+
+      const reflection = document.createElement("div");
+      reflection.className = "reflection";
+
+      const invitation = document.createElement("p");
+      invitation.className = "reflection-intro";
+      invitation.textContent =
+        "Before you step inside, take a moment.";
+
+      const question = document.createElement("p");
+      question.className = "reflection-question";
+      question.textContent =
+        "What is one promise you want to make to yourself?";
+
+      reflection.append(invitation, question);
+      message.replaceChildren(confirmation, reflection);
     }
 
     function showError(error) {
@@ -269,9 +315,7 @@
         });
 
         saveEmail(email);
-
-        message.textContent =
-          "Your sign-in link is on its way. Check your inbox and spam folder, then open the link to come inside.";
+        showEmailSentMessage();
 
         button.textContent = "send another link";
       } catch (error) {
