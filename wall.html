@@ -92,6 +92,24 @@
       border-bottom: 1px solid #bda48a;
     }
 
+    .navigation-signout {
+      padding: 5px 0;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .navigation-signout:hover {
+      color: var(--ink);
+    }
+
+    .navigation-signout:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
     .introduction {
       max-width: 650px;
       margin: auto;
@@ -513,6 +531,13 @@
       <div class="navigation-links">
         <a href="index.html">write</a>
         <a href="wall.html" aria-current="page">the wall</a>
+        <button
+          class="navigation-signout"
+          id="logout-button"
+          type="button"
+        >
+          sign out
+        </button>
       </div>
     </div>
   </nav>
@@ -588,11 +613,6 @@
 
   <script type="module">
     import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-
-    import {
-      getFirestore,
       collection,
       getDocs,
       query,
@@ -601,16 +621,27 @@
       startAfter
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBPnZ8f4cek3JcIwfopsmxnCAGTXoH--yc",
-      authDomain: "typewritertales-5bdda.firebaseapp.com",
-      projectId: "typewritertales-5bdda",
-      storageBucket: "typewritertales-5bdda.firebasestorage.app",
-      messagingSenderId: "631041179526",
-      appId: "1:631041179526:web:7d2fea0e3a5b48ce567607"
-    };
+    import {
+      db,
+      requireSignIn,
+      logOut
+    } from "./auth.js";
 
-    const db = getFirestore(initializeApp(firebaseConfig));
+    await requireSignIn();
+
+    const logoutButton = document.getElementById("logout-button");
+
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+
+      try {
+        await logOut();
+      } catch (error) {
+        console.error("Sign-out failed:", error);
+        alert("Could not sign out. Please try again.");
+        logoutButton.disabled = false;
+      }
+    });
 
     const viewport = document.getElementById("viewport");
     const scene = document.getElementById("scene");
