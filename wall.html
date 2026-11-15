@@ -3,442 +3,603 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta
+    name="description"
+    content="A quiet collection of personal promises, small hopes, and intentions."
+  />
   <title>The Promise Wall · Promises to Self</title>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
+
     :root {
-      --bg: #f3f1ed;
-      --wall: #ebe8e2;
-      --paper: #fdfcf9;
-      --ink: #1f1f1f;
-      --muted: #8a8780;
-      --line: #dedad2;
+      --background: #faf6ef;
+      --paper: #fffaf1;
+      --ink: #514132;
+      --muted: #917c68;
+      --line: #e6d9c8;
+      --accent: #795e46;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
+      background: var(--background);
       color: var(--ink);
       font-family: "Courier Prime", monospace;
     }
 
-    nav {
-      position: fixed;
-      inset: 0 0 auto 0;
-      z-index: 1000;
-      height: 56px;
-      background: rgba(243, 241, 237, 0.94);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(8px);
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .nav-inner {
-      max-width: 1180px;
+    button {
+      font-family: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    .promise-note:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 5px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .navigation {
+      height: 66px;
+      border-bottom: 1px solid rgba(147, 118, 82, 0.14);
+    }
+
+    .navigation-inner {
+      max-width: 1240px;
       height: 100%;
-      margin: 0 auto;
-      padding: 0 24px;
+      margin: auto;
+      padding: 0 28px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-    }
-
-    .nav-logo {
-      color: var(--ink);
-      text-decoration: none;
-      font-family: "Special Elite", serif;
-      font-size: 1.05rem;
-      letter-spacing: 0.03em;
-    }
-
-    .nav-links {
-      display: flex;
+      align-items: center;
       gap: 20px;
-      font-size: 0.74rem;
-      letter-spacing: 0.08em;
     }
 
-    .nav-links a {
-      color: var(--muted);
+    .brand {
+      font-family: "Special Elite", serif;
+      font-size: 1.08rem;
       text-decoration: none;
-      transition: color 0.2s;
+      color: var(--ink);
     }
 
-    .nav-links a:hover,
-    .nav-links a.active { color: var(--ink); }
+    .navigation-links {
+      display: flex;
+      gap: 24px;
+      font-size: 0.78rem;
+    }
 
-    .wall-page { padding-top: 56px; }
+    .navigation-links a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 5px 0;
+    }
 
-    .wall-intro {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 52px 24px 30px;
+    .navigation-links a[aria-current="page"] {
+      color: var(--ink);
+      border-bottom: 1px solid #bda48a;
+    }
+
+    .introduction {
+      max-width: 650px;
+      margin: auto;
       text-align: center;
+      padding: 58px 24px 36px;
     }
 
-    .wall-intro h1 {
-      margin: 0 0 14px;
+    .eyebrow {
+      margin: 0 0 18px;
+      color: #a38b73;
+      font-size: 0.65rem;
+      letter-spacing: 0.19em;
+      text-transform: uppercase;
+    }
+
+    .introduction h1 {
+      margin: 0 0 20px;
       font-family: "Special Elite", serif;
       font-weight: 400;
-      font-size: clamp(1.9rem, 4vw, 2.7rem);
-      letter-spacing: 0.01em;
+      font-size: clamp(1.9rem, 4.5vw, 3rem);
+      line-height: 1.25;
+      color: #614a36;
     }
 
-    .wall-intro p {
-      margin: 0 auto;
-      max-width: 480px;
-      font-size: 0.82rem;
-      line-height: 1.8;
+    .introduction-description {
+      max-width: 470px;
+      margin: auto;
+      font-size: 0.86rem;
+      line-height: 1.9;
       color: var(--muted);
     }
 
-    .wall-tools {
-      max-width: 1180px;
-      margin: 0 auto 14px;
+    .wall-container {
+      max-width: 1240px;
+      margin: auto;
       padding: 0 24px;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
+      margin: 0 4px 14px;
     }
 
-    .promise-count,
-    .board-hint {
+    .promise-count {
       margin: 0;
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
       color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.6;
     }
 
-    .board-hint { text-align: right; }
+    .zoom-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-    .zoom-controls { display: flex; gap: 6px; }
-
-    .zoom-btn {
-      min-width: 32px;
-      height: 32px;
-      padding: 0 10px;
-      border: 1px solid var(--line);
-      background: transparent;
-      color: var(--ink);
-      font-family: inherit;
-      font-size: 0.8rem;
+    .control {
+      min-width: 34px;
+      height: 34px;
+      padding: 0 11px;
+      border: 1px solid #e3d5c2;
+      border-radius: 7px;
+      background: #fffcf6;
+      color: #795e46;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      font-size: 0.88rem;
+      transition: background 180ms, border-color 180ms;
     }
 
-    .zoom-btn:hover {
-      background: var(--ink);
-      border-color: var(--ink);
-      color: var(--bg);
+    .control:hover {
+      background: #efe4d4;
+      border-color: #ceb99f;
     }
 
-    .board-viewport {
+    .control.reset {
+      font-size: 0.7rem;
+    }
+
+    .viewport {
       position: relative;
-      width: min(1180px, calc(100vw - 32px));
-      height: min(74vh, 780px);
-      min-height: 480px;
-      margin: 0 auto;
+      height: clamp(440px, 65vh, 720px);
       overflow: hidden;
-      background-color: var(--wall);
-      background-image:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-      border: 1px solid var(--line);
-      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.05);
-      touch-action: none;
+      isolation: isolate;
+      border: 1px solid #eadfce;
+      border-radius: 20px;
+      background:
+        radial-gradient(
+          ellipse at 42% 28%,
+          rgba(255, 254, 249, 0.95),
+          transparent 75%
+        ),
+        #f1e8da;
+      box-shadow:
+        inset 0 0 90px rgba(130, 95, 55, 0.025),
+        0 14px 40px rgba(103, 75, 44, 0.035);
       cursor: grab;
+      touch-action: none;
       user-select: none;
     }
 
-    .board-viewport.dragging { cursor: grabbing; }
+    .viewport.dragging {
+      cursor: grabbing;
+    }
 
-    .board-scene {
+    .scene {
       position: absolute;
-      left: 50%;
       top: 50%;
-      transform-origin: center center;
+      left: 50%;
+      transform-origin: 0 0;
       will-change: transform;
     }
 
-    .promise-note,
-    .blank-sheet {
+    .promise-note {
       position: absolute;
-      background:
-        linear-gradient(to bottom, transparent 0, transparent 29px, rgba(0,0,0,0.07) 30px, transparent 31px),
-        var(--paper);
-      background-size: 100% 31px;
-      box-shadow:
-        0 1px 1px rgba(0, 0, 0, 0.08),
-        0 6px 14px rgba(0, 0, 0, 0.1);
-      clip-path: polygon(
-        1% 2%, 8% 0.4%, 17% 1.6%, 28% 0.3%, 38% 1.7%,
-        50% 0.4%, 62% 1.8%, 74% 0.3%, 87% 1.4%, 99% 0.6%,
-        98.4% 12%, 100% 24%, 98.2% 36%, 99.8% 48%, 98.4% 60%,
-        100% 72%, 98.2% 84%, 99% 98.5%, 87% 99.3%, 76% 98.2%,
-        63% 99.6%, 51% 98.3%, 39% 99.5%, 27% 98.2%, 15% 99.3%,
-        2% 98%, 0.7% 86%, 1.9% 73%, 0.3% 61%, 1.8% 49%,
-        0.4% 37%, 1.7% 24%, 0.4% 13%
-      );
-      transform: rotate(var(--rot, 0deg));
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      transform: rotate(var(--rotation));
+      filter: drop-shadow(2px 7px 6px rgba(95, 65, 34, 0.13));
+      transition: filter 180ms;
     }
 
-    .blank-sheet {
-      opacity: 0.55;
+    .promise-note:hover,
+    .promise-note:focus-visible {
+      z-index: 10;
+      filter: drop-shadow(3px 12px 9px rgba(95, 65, 34, 0.2));
+    }
+
+    .paper {
+      position: absolute;
+      inset: 0;
+      padding: 36px 24px 46px 36px;
+      overflow: hidden;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 29px,
+          rgba(151, 120, 81, 0.10) 29px,
+          rgba(151, 120, 81, 0.10) 30px
+        ),
+        linear-gradient(130deg, #fffdf7, #fff6e7);
+      clip-path: polygon(
+        1% 1.5%, 8% 0.5%, 17% 1.3%, 28% 0.4%,
+        39% 1.5%, 50% 0.5%, 61% 1.4%, 73% 0.4%,
+        86% 1.4%, 99% 0.7%, 98.7% 14%, 99.7% 27%,
+        98.6% 40%, 99.7% 54%, 98.5% 68%, 99.6% 83%,
+        99% 98.7%, 87% 99.4%, 75% 98.4%, 63% 99.5%,
+        50% 98.5%, 38% 99.5%, 25% 98.5%, 13% 99.4%,
+        1% 98.5%, 1.6% 85%, 0.5% 71%, 1.5% 57%,
+        0.4% 43%, 1.6% 29%, 0.5% 15%
+      );
+    }
+
+    .paper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 24px;
+      width: 1px;
+      background: rgba(171, 119, 91, 0.18);
+    }
+
+    .tape {
+      position: absolute;
+      z-index: 2;
+      width: 72px;
+      height: 23px;
+      top: -5px;
+      left: calc(50% - 36px);
+      background: rgba(218, 197, 164, 0.72);
+      transform: rotate(-4deg);
+      box-shadow: 0 1px 2px rgba(100, 70, 38, 0.06);
+      clip-path: polygon(
+        2% 0, 98% 2%, 100% 25%, 98% 49%,
+        100% 72%, 98% 100%, 0 97%, 2% 74%,
+        0 50%, 2% 26%
+      );
       pointer-events: none;
     }
 
-    .promise-note {
-      padding: 34px 24px 20px 34px;
-      cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
-
-    .promise-note:hover {
-      z-index: 9999 !important;
-      transform: rotate(var(--rot, 0deg)) translateY(-3px);
-      box-shadow:
-        0 2px 2px rgba(0, 0, 0, 0.08),
-        0 14px 26px rgba(0, 0, 0, 0.16);
-    }
-
-    .promise-note::before,
-    .blank-sheet::before {
-      content: "";
-      position: absolute;
-      left: 22px;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: rgba(0, 0, 0, 0.1);
-    }
-
-    .promise-note::after {
-      content: "";
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      width: 10px;
-      height: 10px;
-      margin-left: -5px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, #8a8a8a, #3a3a3a);
-      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
-    }
-
-    .note-tape {
-      position: absolute;
-      top: -9px;
-      right: 22px;
-      z-index: 2;
-      width: 62px;
-      height: 20px;
-      background: rgba(200, 198, 192, 0.7);
-      transform: rotate(4deg);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-    }
-
     .note-text {
-      margin: 0;
-      max-height: 124px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
       overflow: hidden;
-      font-size: 0.82rem;
-      line-height: 31px;
-      color: var(--ink);
+      margin: 0;
+      font-family: "Courier Prime", monospace;
+      font-size: 0.9rem;
+      font-weight: 400;
+      line-height: 30px;
       white-space: pre-wrap;
-      word-break: break-word;
+      overflow-wrap: anywhere;
+      color: #5d4734;
     }
 
     .note-meta {
       position: absolute;
-      left: 34px;
+      left: 36px;
       right: 24px;
-      bottom: 14px;
+      bottom: 20px;
       display: flex;
       justify-content: space-between;
-      gap: 8px;
-      font-size: 0.58rem;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      white-space: nowrap;
+      gap: 10px;
+      font-size: 0.6rem;
+      color: #a18a70;
+    }
+
+    .note-author {
       overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .note-meta span { overflow: hidden; text-overflow: ellipsis; }
+    .note-date {
+      flex-shrink: 0;
+    }
 
-    .state-msg {
+    .state {
       position: absolute;
+      z-index: 20;
+      top: 50%;
       left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%);
-      margin: 0;
-      padding: 8px 16px;
-      background: rgba(253, 252, 249, 0.9);
-      border: 1px solid var(--line);
-      font-size: 0.72rem;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      pointer-events: none;
+      width: min(350px, calc(100% - 48px));
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #9a8066;
+      font-size: 0.85rem;
+      line-height: 1.9;
     }
 
-    .write-cta { text-align: center; padding: 30px 24px 10px; }
+    .state p {
+      margin: 0 0 14px;
+    }
 
-    .write-cta a {
-      color: var(--muted);
+    .state a {
+      color: #71543c;
+      text-underline-offset: 5px;
+    }
+
+    .wall-hint {
+      text-align: center;
+      margin: 16px 0 0;
+      color: #a28c75;
+      font-size: 0.65rem;
+      line-height: 1.8;
+      letter-spacing: 0.025em;
+    }
+
+    .invitation {
+      padding: 36px 24px 0;
+      text-align: center;
+    }
+
+    .invitation a {
+      display: inline-block;
+      color: #795e46;
       text-decoration: none;
-      border-bottom: 1px solid var(--line);
-      font-size: 0.78rem;
-      letter-spacing: 0.06em;
-      transition: color 0.2s, border-color 0.2s;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #cdb79b;
+      font-size: 0.83rem;
+      line-height: 1.7;
     }
 
-    .write-cta a:hover { color: var(--ink); border-color: var(--ink); }
+    .invitation p {
+      margin: 12px 0 0;
+      color: #a18b74;
+      font-size: 0.7rem;
+    }
 
     footer {
-      margin-top: 40px;
-      padding: 28px 20px;
-      border-top: 1px solid var(--line);
+      margin-top: 50px;
+      padding: 26px 20px;
       text-align: center;
-      font-size: 0.68rem;
-      letter-spacing: 0.06em;
-      color: #aaa69e;
+      color: #ae9983;
+      font-size: 0.65rem;
+      line-height: 1.8;
     }
 
-    .promise-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(243, 241, 237, 0.88);
+    dialog {
+      width: min(580px, calc(100vw - 36px));
+      max-height: 85dvh;
+      margin: auto;
+      padding: 0;
+      border: 1px solid #e7d9c5;
+      border-radius: 3px;
+      background: #fffaf1;
+      color: var(--ink);
+      box-shadow: 0 24px 80px rgba(91, 62, 34, 0.19);
+    }
+
+    dialog::backdrop {
+      background: rgba(240, 229, 213, 0.84);
       backdrop-filter: blur(6px);
     }
 
-    .promise-modal.open { display: flex; }
-
-    .modal-note {
+    .reader {
       position: relative;
-      width: min(560px, 100%);
-      max-height: 78vh;
-      overflow: auto;
-      padding: 60px 48px 36px 68px;
+      min-height: 260px;
+      padding: 64px 38px 34px 58px;
       background:
-        linear-gradient(to bottom, transparent 0, transparent 34px, rgba(0,0,0,0.07) 35px, transparent 36px),
-        var(--paper);
-      background-size: 100% 36px;
-      box-shadow: 0 2px 3px rgba(0,0,0,0.08), 0 24px 60px rgba(0,0,0,0.18);
+        linear-gradient(
+          90deg,
+          transparent 37px,
+          rgba(171, 119, 91, 0.18) 37px,
+          rgba(171, 119, 91, 0.18) 38px,
+          transparent 38px
+        ),
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 31px,
+          rgba(151, 120, 81, 0.10) 31px,
+          rgba(151, 120, 81, 0.10) 32px
+        ),
+        #fffaf1;
     }
 
-    .modal-note::before {
-      content: "";
-      position: absolute;
-      left: 44px;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-close {
+    .reader-close {
       position: absolute;
       top: 16px;
-      right: 20px;
-      border: 0;
-      background: none;
-      color: var(--muted);
-      font-family: inherit;
+      right: 18px;
+      padding: 6px;
+      border: none;
+      background: transparent;
+      color: #967d63;
       font-size: 0.72rem;
-      letter-spacing: 0.06em;
       cursor: pointer;
     }
 
-    .modal-close:hover { color: var(--ink); }
-
-    .modal-text {
+    .reader-text {
       margin: 0;
       font-size: 1rem;
-      line-height: 36px;
+      line-height: 32px;
       white-space: pre-wrap;
-      word-break: break-word;
+      overflow-wrap: anywhere;
+      user-select: text;
     }
 
-    .modal-meta {
+    .reader-meta {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       gap: 12px;
-      margin-top: 28px;
+      margin-top: 32px;
       padding-top: 14px;
-      border-top: 1px solid var(--line);
+      border-top: 1px solid #e6d9c8;
+      color: #9b8369;
       font-size: 0.7rem;
-      letter-spacing: 0.06em;
-      color: var(--muted);
+      overflow-wrap: anywhere;
     }
 
-    @media (max-width: 700px) {
-      .wall-tools { grid-template-columns: 1fr auto; }
-      .board-hint { display: none; }
-      .board-viewport { width: calc(100vw - 20px); height: 68vh; }
-      .modal-note { padding: 56px 26px 30px 52px; }
-      .modal-note::before { left: 34px; }
+    @media (max-width: 600px) {
+      .navigation-inner {
+        padding: 0 18px;
+      }
+
+      .brand {
+        font-size: 0.94rem;
+      }
+
+      .navigation-links {
+        gap: 16px;
+        font-size: 0.7rem;
+      }
+
+      .introduction {
+        padding-top: 40px;
+        padding-bottom: 30px;
+      }
+
+      .introduction-description {
+        font-size: 0.8rem;
+      }
+
+      .wall-container {
+        padding: 0 12px;
+      }
+
+      .viewport {
+        height: 58vh;
+        min-height: 390px;
+        border-radius: 14px;
+      }
+
+      .toolbar {
+        gap: 10px;
+      }
+
+      .promise-count {
+        font-size: 0.65rem;
+      }
+
+      .reader {
+        padding: 64px 24px 30px 48px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
     }
   </style>
 </head>
 
 <body>
-  <nav>
-    <div class="nav-inner">
-      <a href="index.html" class="nav-logo">Promises to Self</a>
-      <div class="nav-links">
+  <nav class="navigation" aria-label="Main navigation">
+    <div class="navigation-inner">
+      <a class="brand" href="index.html">Promises to Self</a>
+
+      <div class="navigation-links">
         <a href="index.html">write</a>
-        <a href="wall.html" class="active">the wall</a>
+        <a href="wall.html" aria-current="page">the wall</a>
       </div>
     </div>
   </nav>
 
-  <main class="wall-page">
-    <section class="wall-intro">
-      <h1>The Promise Wall</h1>
-      <p>Promises people made quietly to themselves. Step back to see them all. Move closer to read one.</p>
-    </section>
+  <main>
+    <header class="introduction">
+      <p class="eyebrow">a small place for things that matter</p>
 
-    <div class="wall-tools">
-      <p class="promise-count" id="promise-count">loading...</p>
-      <div class="zoom-controls">
-        <button class="zoom-btn" id="zoom-out" type="button" aria-label="Zoom out">−</button>
-        <button class="zoom-btn" id="zoom-reset" type="button">reset</button>
-        <button class="zoom-btn" id="zoom-in" type="button" aria-label="Zoom in">+</button>
+      <h1>A little promise to yourself.</h1>
+
+      <p class="introduction-description">
+        Some words are easier to leave on paper.
+        Small hopes, quiet intentions, and promises
+        we're learning to keep.
+      </p>
+    </header>
+
+    <section class="wall-container" aria-label="The promise wall">
+      <div class="toolbar">
+        <p class="promise-count" id="promise-count" aria-live="polite">
+          gathering the promises…
+        </p>
+
+        <div class="zoom-controls" aria-label="Wall zoom controls">
+          <button class="control" id="zoom-out"
+            type="button" aria-label="Zoom out">−</button>
+
+          <button class="control reset" id="zoom-reset"
+            type="button" aria-label="Fit all promises">view all</button>
+
+          <button class="control" id="zoom-in"
+            type="button" aria-label="Zoom in">+</button>
+        </div>
       </div>
-      <p class="board-hint">scroll to zoom · drag to move · click to read</p>
-    </div>
 
-    <section class="board-viewport" id="board-viewport" aria-label="Promise wall">
-      <div class="board-scene" id="board-scene"></div>
-      <p class="state-msg" id="state-msg">loading the wall...</p>
+      <div class="viewport" id="viewport">
+        <div class="scene" id="scene"></div>
+
+        <div class="state" id="state" role="status">
+          <p>Gathering the words people have left here…</p>
+        </div>
+      </div>
+
+      <p class="wall-hint">
+        drag to wander · scroll or pinch to move closer · select a promise to read
+      </p>
     </section>
 
-    <div class="write-cta"><a href="index.html">make a promise of your own →</a></div>
+    <section class="invitation">
+      <a href="index.html">leave a little promise here →</a>
+      <p>No perfect words needed. Just something that matters to you.</p>
+    </section>
   </main>
 
-  <footer>© 2026 · Promises to Self · made with patience and coffee</footer>
+  <footer>
+    Promises to Self · one small intention at a time
+  </footer>
 
-  <div class="promise-modal" id="promise-modal" role="dialog" aria-modal="true">
-    <article class="modal-note">
-      <button class="modal-close" id="modal-close" type="button">close ×</button>
-      <p class="modal-text" id="modal-text"></p>
-      <div class="modal-meta">
-        <span id="modal-author"></span>
-        <span id="modal-date"></span>
+  <dialog id="reader-dialog" aria-label="Read a promise">
+    <article class="reader">
+      <button class="reader-close" id="reader-close" type="button">
+        close ×
+      </button>
+
+      <p class="reader-text" id="reader-text"></p>
+
+      <div class="reader-meta">
+        <span id="reader-author"></span>
+        <span id="reader-date"></span>
       </div>
     </article>
-  </div>
+  </dialog>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, orderBy, query, limit }
-      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      query,
+      orderBy,
+      limit,
+      startAfter
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPnZ8f4cek3JcIwfopsmxnCAGTXoH--yc",
@@ -451,204 +612,491 @@
 
     const db = getFirestore(initializeApp(firebaseConfig));
 
-    const MIN_SHEETS = 16;
-    const CELL_W = 330;
-    const CELL_H = 300;
-    const PAD = 110;
+    const viewport = document.getElementById("viewport");
+    const scene = document.getElementById("scene");
+    const state = document.getElementById("state");
+    const count = document.getElementById("promise-count");
 
-    const viewport = document.getElementById("board-viewport");
-    const scene = document.getElementById("board-scene");
-    const stateMsg = document.getElementById("state-msg");
-    const countEl = document.getElementById("promise-count");
-    const modal = document.getElementById("promise-modal");
+    const dialog = document.getElementById("reader-dialog");
+    const readerText = document.getElementById("reader-text");
+    const readerAuthor = document.getElementById("reader-author");
+    const readerDate = document.getElementById("reader-date");
 
-    let scale = 0.6, tx = 0, ty = 0;
-    let sceneW = 1000, sceneH = 640;
-    let dragging = false, moved = false;
-    let startX = 0, startY = 0, startTx = 0, startTy = 0;
+    let sceneWidth = 400;
+    let sceneHeight = 350;
 
-    const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+    let scale = 1;
+    let minimumScale = 0.1;
+    let offsetX = 0;
+    let offsetY = 0;
 
-    function rand(seed) {
-      const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
-      return x - Math.floor(x);
+    let activeNote = null;
+    let previousBodyOverflow = "";
+    let gestureMoved = false;
+    let gestureStart = null;
+
+    const pointers = new Map();
+
+    const clamp = (value, min, max) =>
+      Math.min(Math.max(value, min), max);
+
+    function seededRandom(seed) {
+      const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+      return value - Math.floor(value);
     }
 
-    function hash(str) {
-      let h = 0;
-      for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
-      return Math.abs(h);
+    function hash(value) {
+      let result = 0;
+
+      for (const character of String(value)) {
+        result = ((result << 5) - result) + character.charCodeAt(0);
+        result |= 0;
+      }
+
+      return Math.abs(result);
     }
 
-    function esc(v) {
-      return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    }
+    function formatDate(timestamp) {
+      if (!timestamp || typeof timestamp.toDate !== "function") {
+        return "";
+      }
 
-    function fmt(ts) {
-      return ts && ts.toDate
-        ? ts.toDate().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-        : "";
+      return timestamp.toDate().toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
     }
 
     function applyTransform() {
       scene.style.transform =
-        `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scale})`;
+        `translate(${offsetX - sceneWidth * scale / 2}px, ` +
+        `${offsetY - sceneHeight * scale / 2}px) scale(${scale})`;
     }
 
-    function fit() {
-      const r = viewport.getBoundingClientRect();
-      scale = clamp(Math.min(r.width / sceneW, r.height / sceneH) * 0.96, 0.25, 1);
-      tx = 0; ty = 0;
+    function fitBoard() {
+      const availableWidth = Math.max(1, viewport.clientWidth - 40);
+      const availableHeight = Math.max(1, viewport.clientHeight - 40);
+
+      const fittedScale = Math.min(
+        availableWidth / sceneWidth,
+        availableHeight / sceneHeight,
+        1.3
+      );
+
+      minimumScale = Math.min(fittedScale * 0.6, 0.2);
+      scale = fittedScale;
+      offsetX = 0;
+      offsetY = 0;
+
       applyTransform();
     }
 
-    function zoomBy(delta, cx, cy) {
-      const prev = scale;
-      scale = clamp(scale + delta, 0.2, 2);
-      if (cx !== undefined) {
-        const r = viewport.getBoundingClientRect();
-        const ox = cx - r.left - r.width / 2;
-        const oy = cy - r.top - r.height / 2;
-        const k = scale / prev;
-        tx = ox - (ox - tx) * k;
-        ty = oy - (oy - ty) * k;
-      }
+    function zoomTo(nextScale, clientX, clientY) {
+      const rectangle = viewport.getBoundingClientRect();
+
+      const pointX = clientX === undefined
+        ? 0
+        : clientX - rectangle.left - viewport.clientLeft
+          - viewport.clientWidth / 2;
+
+      const pointY = clientY === undefined
+        ? 0
+        : clientY - rectangle.top - viewport.clientTop
+          - viewport.clientHeight / 2;
+
+      const updatedScale = clamp(nextScale, minimumScale, 2.8);
+      const ratio = updatedScale / scale;
+
+      offsetX = pointX - (pointX - offsetX) * ratio;
+      offsetY = pointY - (pointY - offsetY) * ratio;
+      scale = updatedScale;
+
       applyTransform();
     }
 
-    function openNote(p) {
-      document.getElementById("modal-text").textContent = p.text || "";
-      document.getElementById("modal-author").textContent = p.author || "anonymous";
-      document.getElementById("modal-date").textContent = fmt(p.createdAt);
-      modal.classList.add("open");
+    function openPromise(promise, button) {
+      if (dialog.open) return;
+
+      activeNote = button;
+
+      readerText.textContent = promise.text;
+      readerAuthor.textContent = promise.author || "anonymous";
+      readerDate.textContent = formatDate(promise.createdAt);
+
+      previousBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
+
+      dialog.showModal();
+      document.getElementById("reader-close").focus();
     }
 
-    function closeNote() {
-      modal.classList.remove("open");
-      document.body.style.overflow = "";
-    }
+    function createNote(promise, index, columns, rows) {
+      const seed = hash(promise.id);
+      const width = 260;
+      const height = 270;
+      const cellWidth = 315;
+      const cellHeight = 315;
+      const padding = 38;
 
-    function buildBoard(promises) {
-      const total = Math.max(promises.length, MIN_SHEETS);
-      const cols = Math.max(3, Math.ceil(Math.sqrt(total * 1.6)));
-      const rows = Math.ceil(total / cols);
+      const row = Math.floor(index / columns);
+      const column = index % columns;
+      const itemsInRow = Math.min(
+        columns,
+        currentPromises.length - row * columns
+      );
 
-      sceneW = Math.max(1000, cols * CELL_W + PAD * 2);
-      sceneH = Math.max(640, rows * CELL_H + PAD * 2);
-      scene.style.width = sceneW + "px";
-      scene.style.height = sceneH + "px";
-      scene.innerHTML = "";
+      const rowOffset = (columns - itemsInRow) * cellWidth / 2;
+      const jitterX = (seededRandom(seed + 1) - 0.5) * 18;
+      const jitterY = (seededRandom(seed + 2) - 0.5) * 16;
+      const rotation = (seededRandom(seed + 3) - 0.5) * 7;
 
-      const slots = Array.from({ length: total }, (_, i) => i)
-        .map(i => ({ i, r: rand(i + 7) }))
-        .sort((a, b) => a.r - b.r)
-        .map(o => o.i);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "promise-note";
+      button.setAttribute(
+        "aria-label",
+        `Read a promise by ${promise.author || "anonymous"}`
+      );
 
-      const offsetX = (sceneW - cols * CELL_W) / 2;
-      const offsetY = (sceneH - rows * CELL_H) / 2;
+      button.style.width = `${width}px`;
+      button.style.height = `${height}px`;
+      button.style.left = `${
+        padding + rowOffset + column * cellWidth
+        + (cellWidth - width) / 2 + jitterX
+      }px`;
 
-      slots.forEach((slot, order) => {
-        const col = slot % cols;
-        const row = Math.floor(slot / cols);
-        const promise = promises[order];
-        const seed = hash(promise ? promise.id : "blank" + slot) + slot;
+      button.style.top = `${
+        padding + row * cellHeight
+        + (cellHeight - height) / 2 + jitterY
+      }px`;
 
-        const w = 220 + Math.round(rand(seed + 1) * 40);
-        const h = 200 + Math.round(rand(seed + 2) * 40);
-        const x = offsetX + col * CELL_W + (CELL_W - w) / 2 + (rand(seed + 3) - 0.5) * 50;
-        const y = offsetY + row * CELL_H + (CELL_H - h) / 2 + (rand(seed + 4) - 0.5) * 40;
-        const rot = (rand(seed + 5) - 0.5) * 10;
+      button.style.setProperty("--rotation", `${rotation}deg`);
 
-        const el = document.createElement("article");
-        el.style.cssText =
-          `width:${w}px;height:${h}px;left:${x}px;top:${y}px;--rot:${rot.toFixed(1)}deg;z-index:${order + 1}`;
+      const paper = document.createElement("div");
+      paper.className = "paper";
 
-        if (!promise) {
-          el.className = "blank-sheet";
-        } else {
-          el.className = "promise-note";
-          el.tabIndex = 0;
-          el.setAttribute("role", "button");
-          el.innerHTML = `
-            ${rand(seed + 6) > 0.55 ? '<span class="note-tape"></span>' : ""}
-            <p class="note-text">${esc(promise.text)}</p>
-            <div class="note-meta">
-              <span>${esc(promise.author || "anonymous")}</span>
-              <span>${fmt(promise.createdAt)}</span>
-            </div>`;
-          el.addEventListener("click", () => { if (!moved) openNote(promise); });
-          el.addEventListener("keydown", e => {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openNote(promise); }
-          });
-        }
-        scene.appendChild(el);
+      const text = document.createElement("p");
+      text.className = "note-text";
+      text.textContent = promise.text;
+
+      const meta = document.createElement("div");
+      meta.className = "note-meta";
+
+      const author = document.createElement("span");
+      author.className = "note-author";
+      author.textContent = promise.author || "anonymous";
+
+      const date = document.createElement("span");
+      date.className = "note-date";
+      date.textContent = formatDate(promise.createdAt);
+
+      const tape = document.createElement("span");
+      tape.className = "tape";
+      tape.setAttribute("aria-hidden", "true");
+
+      meta.append(author, date);
+      paper.append(text, meta);
+      button.append(paper, tape);
+
+      button.addEventListener("click", event => {
+        if (event.detail !== 0 && gestureMoved) return;
+        openPromise(promise, button);
       });
 
-      fit();
+      return button;
     }
 
-    async function load() {
-      try {
-        const q = query(collection(db, "submissions"), orderBy("createdAt", "desc"), limit(150));
-        const snap = await getDocs(q);
-        const promises = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    let currentPromises = [];
 
-        buildBoard(promises);
-        countEl.textContent = `${promises.length} promise${promises.length === 1 ? "" : "s"} on the wall`;
+    function renderBoard(promises) {
+      currentPromises = promises;
+      scene.replaceChildren();
+
+      if (!promises.length) {
+        sceneWidth = 400;
+        sceneHeight = 350;
+        fitBoard();
+        return;
+      }
+
+      const columns = promises.length <= 3
+        ? promises.length
+        : Math.ceil(Math.sqrt(promises.length * 1.35));
+
+      const rows = Math.ceil(promises.length / columns);
+
+      sceneWidth = columns * 315 + 76;
+      sceneHeight = rows * 315 + 76;
+
+      scene.style.width = `${sceneWidth}px`;
+      scene.style.height = `${sceneHeight}px`;
+
+      const fragment = document.createDocumentFragment();
+
+      promises.forEach((promise, index) => {
+        fragment.append(createNote(promise, index, columns, rows));
+      });
+
+      scene.append(fragment);
+      fitBoard();
+    }
+
+    async function loadPromises() {
+      const promises = [];
+      let lastDocument = null;
+
+      try {
+        while (true) {
+          const constraints = [orderBy("createdAt", "desc")];
+
+          if (lastDocument) {
+            constraints.push(startAfter(lastDocument));
+          }
+
+          constraints.push(limit(100));
+
+          const snapshot = await getDocs(
+            query(collection(db, "submissions"), ...constraints)
+          );
+
+          snapshot.docs.forEach(document => {
+            const data = document.data();
+
+            if (typeof data.text === "string" && data.text.trim()) {
+              promises.push({
+                id: document.id,
+                text: data.text,
+                author: typeof data.author === "string"
+                  ? data.author
+                  : "anonymous",
+                createdAt: data.createdAt
+              });
+            }
+          });
+
+          if (snapshot.size < 100) break;
+
+          lastDocument = snapshot.docs[snapshot.docs.length - 1];
+        }
+
+        renderBoard(promises);
+
+        count.textContent = promises.length === 1
+          ? "one quiet promise, so far"
+          : `${promises.length} little promises`;
 
         if (promises.length) {
-          stateMsg.remove();
+          state.hidden = true;
         } else {
-          stateMsg.textContent = "the wall is waiting for its first promise";
+          state.replaceChildren();
+
+          const message = document.createElement("p");
+          message.textContent =
+            "Every collection begins with a few honest words.";
+
+          const link = document.createElement("a");
+          link.href = "index.html";
+          link.textContent = "Leave the first promise →";
+
+          state.append(message, link);
         }
-      } catch (err) {
-        console.error(err);
-        buildBoard([]);
-        stateMsg.textContent = "could not load the wall. try again later.";
-        countEl.textContent = "";
+      } catch (error) {
+        console.error("Could not load promises:", error);
+
+        if (promises.length) {
+          renderBoard(promises);
+          count.textContent =
+            `${promises.length} promises loaded · refresh to try the rest`;
+          state.hidden = true;
+        } else {
+          count.textContent = "a quiet pause";
+          state.textContent =
+            "We couldn't gather the promises just now. Please refresh and try again.";
+        }
       }
     }
 
-    viewport.addEventListener("wheel", e => {
-      e.preventDefault();
-      zoomBy(e.deltaY < 0 ? 0.08 : -0.08, e.clientX, e.clientY);
+    function gestureGeometry() {
+      const values = [...pointers.values()];
+
+      if (values.length >= 2) {
+        return {
+          x: (values[0].x + values[1].x) / 2,
+          y: (values[0].y + values[1].y) / 2,
+          distance: Math.hypot(
+            values[0].x - values[1].x,
+            values[0].y - values[1].y
+          )
+        };
+      }
+
+      return {
+        x: values[0]?.x || 0,
+        y: values[0]?.y || 0,
+        distance: 0
+      };
+    }
+
+    function beginGesture() {
+      const geometry = gestureGeometry();
+
+      gestureStart = {
+        ...geometry,
+        scale,
+        offsetX,
+        offsetY
+      };
+
+      if (pointers.size > 1) {
+        gestureMoved = true;
+      }
+    }
+
+    viewport.addEventListener("pointerdown", event => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (event.target.closest("a")) return;
+
+      if (pointers.size === 0) {
+        gestureMoved = false;
+      }
+
+      pointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY
+      });
+
+      beginGesture();
+    });
+
+    window.addEventListener("pointermove", event => {
+      if (!pointers.has(event.pointerId)) return;
+
+      pointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY
+      });
+
+      const geometry = gestureGeometry();
+      const dx = geometry.x - gestureStart.x;
+      const dy = geometry.y - gestureStart.y;
+
+      if (pointers.size >= 2) {
+        const rectangle = viewport.getBoundingClientRect();
+
+        const centerX = rectangle.left + viewport.clientLeft
+          + viewport.clientWidth / 2;
+
+        const centerY = rectangle.top + viewport.clientTop
+          + viewport.clientHeight / 2;
+
+        scale = clamp(
+          gestureStart.scale
+            * geometry.distance / Math.max(gestureStart.distance, 1),
+          minimumScale,
+          2.8
+        );
+
+        const ratio = scale / gestureStart.scale;
+
+        offsetX = geometry.x - centerX
+          - (gestureStart.x - centerX - gestureStart.offsetX) * ratio;
+
+        offsetY = geometry.y - centerY
+          - (gestureStart.y - centerY - gestureStart.offsetY) * ratio;
+
+        gestureMoved = true;
+      } else {
+        if (Math.hypot(dx, dy) > 5) {
+          gestureMoved = true;
+        }
+
+        if (!gestureMoved) return;
+
+        offsetX = gestureStart.offsetX + dx;
+        offsetY = gestureStart.offsetY + dy;
+      }
+
+      viewport.classList.add("dragging");
+      applyTransform();
+    });
+
+    function finishPointer(event) {
+      if (!pointers.has(event.pointerId)) return;
+
+      pointers.delete(event.pointerId);
+
+      if (pointers.size) {
+        beginGesture();
+      } else {
+        gestureStart = null;
+        viewport.classList.remove("dragging");
+      }
+    }
+
+    window.addEventListener("pointerup", finishPointer);
+    window.addEventListener("pointercancel", finishPointer);
+
+    window.addEventListener("blur", () => {
+      pointers.clear();
+      gestureStart = null;
+      viewport.classList.remove("dragging");
+    });
+
+    viewport.addEventListener("wheel", event => {
+      event.preventDefault();
+
+      const delta = clamp(event.deltaY, -100, 100);
+      zoomTo(
+        scale * Math.exp(-delta * 0.004),
+        event.clientX,
+        event.clientY
+      );
     }, { passive: false });
 
-    viewport.addEventListener("pointerdown", e => {
-      dragging = true;
-      moved = false;
-      startX = e.clientX; startY = e.clientY;
-      startTx = tx; startTy = ty;
-      viewport.classList.add("dragging");
+    document.getElementById("zoom-in").addEventListener(
+      "click",
+      () => zoomTo(scale * 1.25)
+    );
+
+    document.getElementById("zoom-out").addEventListener(
+      "click",
+      () => zoomTo(scale / 1.25)
+    );
+
+    document.getElementById("zoom-reset").addEventListener(
+      "click",
+      fitBoard
+    );
+
+    document.getElementById("reader-close").addEventListener(
+      "click",
+      () => dialog.close()
+    );
+
+    dialog.addEventListener("click", event => {
+      if (event.target !== dialog) return;
+
+      const rectangle = dialog.getBoundingClientRect();
+
+      if (
+        event.clientX < rectangle.left ||
+        event.clientX > rectangle.right ||
+        event.clientY < rectangle.top ||
+        event.clientY > rectangle.bottom
+      ) {
+        dialog.close();
+      }
     });
 
-    window.addEventListener("pointermove", e => {
-      if (!dragging) return;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
-      if (moved) { tx = startTx + dx; ty = startTy + dy; applyTransform(); }
+    dialog.addEventListener("close", () => {
+      document.body.style.overflow = previousBodyOverflow;
+      activeNote?.focus({ preventScroll: true });
     });
 
-    window.addEventListener("pointerup", () => {
-      if (!dragging) return;
-      dragging = false;
-      viewport.classList.remove("dragging");
-      setTimeout(() => { moved = false; }, 0);
-    });
+    window.addEventListener("resize", fitBoard);
 
-    document.getElementById("zoom-in").addEventListener("click", () => zoomBy(0.15));
-    document.getElementById("zoom-out").addEventListener("click", () => zoomBy(-0.15));
-    document.getElementById("zoom-reset").addEventListener("click", fit);
-    window.addEventListener("resize", fit);
-
-    document.getElementById("modal-close").addEventListener("click", closeNote);
-    modal.addEventListener("click", e => { if (e.target === modal) closeNote(); });
-    window.addEventListener("keydown", e => { if (e.key === "Escape") closeNote(); });
-
-    load();
+    loadPromises();
   </script>
 </body>
 </html>
