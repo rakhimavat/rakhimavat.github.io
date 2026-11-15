@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Step inside · Promises to Self</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 30px 20px;
+      background: #faf6ef;
+      color: #574332;
+      font-family: "Courier Prime", monospace;
+    }
+
+    main {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .brand {
+      margin-bottom: 42px;
+      text-align: center;
+      color: #9a8066;
+      font-size: 0.78rem;
+    }
+
+    .paper {
+      padding: 44px 32px;
+      background: #fffaf1;
+      border: 1px solid #eadcca;
+      box-shadow: 0 14px 45px rgba(100, 70, 40, 0.06);
+      border-radius: 5px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-family: "Special Elite", serif;
+      font-size: 1.9rem;
+      font-weight: 400;
+      line-height: 1.3;
+    }
+
+    .intro,
+    .footnote {
+      color: #917a64;
+      font-size: 0.82rem;
+      line-height: 1.85;
+    }
+
+    form {
+      margin-top: 28px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 0.76rem;
+    }
+
+    input,
+    button {
+      width: 100%;
+      min-height: 46px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      border-radius: 5px;
+    }
+
+    input {
+      padding: 12px;
+      border: 1px solid #dfceba;
+      background: #fffdf8;
+      color: #574332;
+    }
+
+    input:focus {
+      outline: 2px solid #b79b7c;
+      outline-offset: 2px;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 12px;
+      border: none;
+      background: #795e46;
+      color: #fffaf1;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    #message {
+      margin: 18px 0 0;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    .footnote {
+      margin: 22px 0 0;
+      text-align: center;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="brand">Promises to Self</div>
+
+    <section class="paper">
+      <h1>A little space for you.</h1>
+
+      <p class="intro" id="intro">
+        Leave a promise. Read a few quiet hopes.
+        Enter your email and we'll send you a link to step inside.
+        No password needed.
+      </p>
+
+      <form id="login-form">
+        <label for="email">your email address</label>
+
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          required
+        />
+
+        <button id="submit" type="submit">
+          send me a sign-in link
+        </button>
+      </form>
+
+      <p id="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <p class="footnote">
+      Your email is used for sign-in, not displayed on the wall.
+      Promises are shared with signed-in members.
+    </p>
+  </main>
+
+  <script type="module">
+    import { auth } from "./auth.js";
+
+    import {
+      sendSignInLinkToEmail,
+      isSignInWithEmailLink,
+      signInWithEmailLink,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const form = document.getElementById("login-form");
+    const emailInput = document.getElementById("email");
+    const button = document.getElementById("submit");
+    const message = document.getElementById("message");
+    const intro = document.getElementById("intro");
+
+    const params = new URLSearchParams(location.search);
+
+    const nextPage = params.get("next") === "wall.html"
+      ? "wall.html"
+      : "index.html";
+
+    const incomingLink = location.href;
+    const completingSignIn = isSignInWithEmailLink(auth, incomingLink);
+
+    function readSavedEmail() {
+      try {
+        return localStorage.getItem("emailForSignIn") || "";
+      } catch {
+        return "";
+      }
+    }
+
+    function saveEmail(email) {
+      try {
+        localStorage.setItem("emailForSignIn", email);
+      } catch {
+        // The confirmation form also works without local storage.
+      }
+    }
+
+    function clearSavedEmail() {
+      try {
+        localStorage.removeItem("emailForSignIn");
+      } catch {}
+    }
+
+    function showError(error) {
+      console.error("Email sign-in error:", error.code, error.message);
+
+      const messages = {
+        "auth/invalid-email": "Please enter a valid email address.",
+        "auth/expired-action-code":
+          "This link has expired. Open login.html again to request a fresh link.",
+        "auth/invalid-action-code":
+          "This link is invalid or has already been used. Request a fresh sign-in link.",
+        "auth/too-many-requests":
+          "Too many attempts just now. Please wait before trying again.",
+        "auth/quota-exceeded":
+          "The email sending limit has been reached. Please try again later.",
+        "auth/network-request-failed":
+          "We couldn't connect. Check your internet connection and try again.",
+        "auth/unauthorized-continue-uri":
+          "The website domain needs to be authorized in Firebase.",
+        "auth/operation-not-allowed":
+          "Email-link sign-in needs to be enabled in Firebase."
+      };
+
+      message.textContent = messages[error.code]
+        || `Sign-in couldn't be completed (${error.code || "unknown error"}). Please try again.`;
+    }
+
+    async function completeSignIn(email) {
+      button.disabled = true;
+      message.textContent = "Opening your little space…";
+
+      try {
+        await signInWithEmailLink(auth, email, incomingLink);
+        clearSavedEmail();
+
+        // Remove the one-time sign-in code from browser history.
+        history.replaceState(null, "", "login.html");
+        location.replace(nextPage);
+      } catch (error) {
+        showError(error);
+        button.disabled = false;
+      }
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const email = emailInput.value.trim();
+
+      if (completingSignIn) {
+        await completeSignIn(email);
+        return;
+      }
+
+      button.disabled = true;
+      message.textContent = "Sending your link…";
+
+      try {
+        const returnUrl = new URL("login.html", location.href);
+        returnUrl.searchParams.set("next", nextPage);
+
+        await sendSignInLinkToEmail(auth, email, {
+          url: returnUrl.href,
+          handleCodeInApp: true
+        });
+
+        saveEmail(email);
+
+        message.textContent =
+          "Your sign-in link is on its way. Check your inbox and spam folder, then open the link to come inside.";
+
+        button.textContent = "send another link";
+      } catch (error) {
+        showError(error);
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    if (completingSignIn) {
+      intro.textContent =
+        "Confirm the email address you used to request this link.";
+
+      button.textContent = "confirm email and step inside";
+
+      const savedEmail = readSavedEmail();
+
+      if (savedEmail) {
+        emailInput.value = savedEmail;
+        completeSignIn(savedEmail);
+      }
+    } else {
+      onAuthStateChanged(auth, user => {
+        if (user && user.emailVerified) {
+          location.replace(nextPage);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
