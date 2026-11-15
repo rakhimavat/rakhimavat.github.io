@@ -7,13 +7,12 @@
 
   <style>
     :root {
-      --cream: #f5f0e8;
-      --paper: #fffdf7;
-      --ink: #2c2c2c;
-      --muted: #8c8174;
-      --cork-dark: #6d4428;
-      --cork-mid: #8c5a36;
-      --cork-light: #b98051;
+      --bg: #f3f1ed;
+      --wall: #ebe8e2;
+      --paper: #fdfcf9;
+      --ink: #1f1f1f;
+      --muted: #8a8780;
+      --line: #dedad2;
     }
 
     * { box-sizing: border-box; }
@@ -21,18 +20,18 @@
     body {
       margin: 0;
       min-height: 100vh;
-      overflow-x: hidden;
-      background: var(--cream);
+      background: var(--bg);
       color: var(--ink);
+      font-family: "Courier Prime", monospace;
     }
 
     nav {
       position: fixed;
       inset: 0 0 auto 0;
       z-index: 1000;
-      height: 58px;
-      border-bottom: 1px solid #d8ccbd;
-      background: rgba(245, 240, 232, 0.96);
+      height: 56px;
+      background: rgba(243, 241, 237, 0.94);
+      border-bottom: 1px solid var(--line);
       backdrop-filter: blur(8px);
     }
 
@@ -50,56 +49,48 @@
       color: var(--ink);
       text-decoration: none;
       font-family: "Special Elite", serif;
-      font-size: 1.08rem;
+      font-size: 1.05rem;
       letter-spacing: 0.03em;
     }
 
     .nav-links {
       display: flex;
-      gap: 18px;
-      font-family: "Courier Prime", monospace;
+      gap: 20px;
       font-size: 0.74rem;
       letter-spacing: 0.08em;
     }
 
     .nav-links a {
-      color: #807568;
+      color: var(--muted);
       text-decoration: none;
-      transition: color 0.2s ease;
+      transition: color 0.2s;
     }
 
     .nav-links a:hover,
-    .nav-links a.active {
-      color: var(--ink);
-    }
+    .nav-links a.active { color: var(--ink); }
 
-    .wall-page {
-      padding-top: 58px;
-      min-height: 100vh;
-    }
+    .wall-page { padding-top: 56px; }
 
     .wall-intro {
-      max-width: 900px;
-      padding: 42px 24px 26px;
+      max-width: 720px;
       margin: 0 auto;
+      padding: 52px 24px 30px;
       text-align: center;
     }
 
     .wall-intro h1 {
-      margin: 0 0 12px;
+      margin: 0 0 14px;
       font-family: "Special Elite", serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      color: var(--ink);
-      line-height: 1.2;
+      font-weight: 400;
+      font-size: clamp(1.9rem, 4vw, 2.7rem);
+      letter-spacing: 0.01em;
     }
 
     .wall-intro p {
-      max-width: 620px;
       margin: 0 auto;
-      font-family: "Courier Prime", monospace;
-      font-size: 0.84rem;
-      line-height: 1.75;
-      letter-spacing: 0.02em;
+      max-width: 480px;
+      font-size: 0.82rem;
+      line-height: 1.8;
       color: var(--muted);
     }
 
@@ -107,314 +98,211 @@
       max-width: 1180px;
       margin: 0 auto 14px;
       padding: 0 24px;
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: space-between;
       gap: 16px;
     }
 
     .promise-count,
     .board-hint {
       margin: 0;
-      font-family: "Courier Prime", monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.07em;
-      color: #998d7f;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
     }
 
-    .zoom-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .board-hint { text-align: right; }
+
+    .zoom-controls { display: flex; gap: 6px; }
 
     .zoom-btn {
-      width: 32px;
+      min-width: 32px;
       height: 32px;
-      border: 1px solid #cfc1b0;
-      background: #fffdf8;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: transparent;
       color: var(--ink);
+      font-family: inherit;
+      font-size: 0.8rem;
       cursor: pointer;
-      font-family: "Courier Prime", monospace;
-      font-size: 1rem;
-      line-height: 1;
-      transition: background 0.18s ease, transform 0.18s ease;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
 
     .zoom-btn:hover {
       background: var(--ink);
-      color: var(--cream);
-      transform: translateY(-1px);
-    }
-
-    .zoom-btn.reset {
-      width: auto;
-      padding: 0 11px;
-      font-size: 0.67rem;
-      letter-spacing: 0.06em;
-      text-transform: lowercase;
+      border-color: var(--ink);
+      color: var(--bg);
     }
 
     .board-viewport {
       position: relative;
       width: min(1180px, calc(100vw - 32px));
-      height: min(72vh, 760px);
-      min-height: 500px;
+      height: min(74vh, 780px);
+      min-height: 480px;
       margin: 0 auto;
       overflow: hidden;
-      border: 14px solid #50311e;
-      outline: 1px solid #b98357;
-      box-shadow:
-        0 10px 24px rgba(67, 42, 25, 0.22),
-        inset 0 0 0 3px rgba(255, 218, 172, 0.18);
-      background:
-        radial-gradient(circle at 14% 21%, rgba(255, 224, 175, 0.23) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 71% 38%, rgba(55, 27, 11, 0.18) 0 1px, transparent 1.8px),
-        radial-gradient(circle at 32% 77%, rgba(255, 226, 181, 0.16) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 88% 84%, rgba(53, 28, 12, 0.16) 0 1px, transparent 1.6px),
-        repeating-linear-gradient(
-          115deg,
-          rgba(255,255,255,0.03) 0 2px,
-          transparent 2px 9px
-        ),
-        linear-gradient(135deg, var(--cork-light), var(--cork-mid) 45%, var(--cork-dark));
+      background-color: var(--wall);
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      border: 1px solid var(--line);
+      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.05);
       touch-action: none;
       cursor: grab;
       user-select: none;
     }
 
-    .board-viewport.dragging {
-      cursor: grabbing;
-    }
-
-    .board-shadow-label {
-      position: absolute;
-      z-index: 20;
-      left: 18px;
-      bottom: 14px;
-      color: rgba(255, 247, 235, 0.72);
-      font-family: "Courier Prime", monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      pointer-events: none;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-    }
+    .board-viewport.dragging { cursor: grabbing; }
 
     .board-scene {
       position: absolute;
-      width: 1600px;
-      height: 1100px;
       left: 50%;
       top: 50%;
       transform-origin: center center;
       will-change: transform;
     }
 
-    .board-scene::before {
-      content: "";
+    .promise-note,
+    .blank-sheet {
       position: absolute;
-      inset: 0;
-      background-image:
-        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.16) 0 1px, transparent 1.4px),
-        radial-gradient(circle at 76% 30%, rgba(40,20,8,0.15) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 32% 68%, rgba(255,255,255,0.12) 0 1px, transparent 1.2px),
-        radial-gradient(circle at 90% 80%, rgba(50,24,8,0.16) 0 1px, transparent 1.5px);
-      background-size: 88px 76px, 126px 104px, 156px 142px, 114px 126px;
-      opacity: 0.7;
+      background:
+        linear-gradient(to bottom, transparent 0, transparent 29px, rgba(0,0,0,0.07) 30px, transparent 31px),
+        var(--paper);
+      background-size: 100% 31px;
+      box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.08),
+        0 6px 14px rgba(0, 0, 0, 0.1);
+      clip-path: polygon(
+        1% 2%, 8% 0.4%, 17% 1.6%, 28% 0.3%, 38% 1.7%,
+        50% 0.4%, 62% 1.8%, 74% 0.3%, 87% 1.4%, 99% 0.6%,
+        98.4% 12%, 100% 24%, 98.2% 36%, 99.8% 48%, 98.4% 60%,
+        100% 72%, 98.2% 84%, 99% 98.5%, 87% 99.3%, 76% 98.2%,
+        63% 99.6%, 51% 98.3%, 39% 99.5%, 27% 98.2%, 15% 99.3%,
+        2% 98%, 0.7% 86%, 1.9% 73%, 0.3% 61%, 1.8% 49%,
+        0.4% 37%, 1.7% 24%, 0.4% 13%
+      );
+      transform: rotate(var(--rot, 0deg));
+    }
+
+    .blank-sheet {
+      opacity: 0.55;
       pointer-events: none;
     }
 
     .promise-note {
-      --rotation: -2deg;
-      --paper-color: #fffdf7;
-      position: absolute;
-      width: 290px;
-      min-height: 230px;
-      padding: 32px 27px 22px;
-      border: 1px solid rgba(92, 70, 46, 0.22);
-      background:
-        linear-gradient(
-          to bottom,
-          transparent 0,
-          transparent 31px,
-          rgba(115, 152, 185, 0.17) 32px,
-          transparent 33px
-        ),
-        var(--paper-color);
-      background-size: 100% 33px;
-      box-shadow:
-        5px 8px 10px rgba(45, 25, 12, 0.36),
-        0 1px 0 rgba(255,255,255,0.55) inset;
-      clip-path: polygon(
-        1% 2%, 7% 0.4%, 16% 1.7%, 27% 0.3%, 37% 1.8%,
-        49% 0.5%, 61% 1.9%, 74% 0.4%, 87% 1.5%, 99% 0.6%,
-        98.5% 11%, 100% 22%, 98.2% 34%, 99.8% 46%, 98.4% 58%,
-        100% 70%, 98.1% 82%, 99% 98%, 87% 99.2%, 76% 98.1%,
-        64% 99.6%, 51% 98.2%, 39% 99.5%, 27% 98.1%, 15% 99.3%,
-        2% 98%, 0.7% 86%, 1.9% 73%, 0.3% 61%, 1.8% 49%,
-        0.4% 37%, 1.7% 24%, 0.4% 13%
-      );
-      transform: rotate(var(--rotation));
-      transform-origin: center;
+      padding: 34px 24px 20px 34px;
       cursor: pointer;
-      transition:
-        box-shadow 0.2s ease,
-        filter 0.2s ease;
-      user-select: none;
-      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
     }
 
     .promise-note:hover {
-      z-index: 50 !important;
+      z-index: 9999 !important;
+      transform: rotate(var(--rot, 0deg)) translateY(-3px);
       box-shadow:
-        8px 12px 15px rgba(45, 25, 12, 0.42),
-        0 1px 0 rgba(255,255,255,0.55) inset;
-      filter: brightness(1.025);
+        0 2px 2px rgba(0, 0, 0, 0.08),
+        0 14px 26px rgba(0, 0, 0, 0.16);
     }
 
-    .promise-note::before {
+    .promise-note::before,
+    .blank-sheet::before {
       content: "";
       position: absolute;
-      left: 20px;
+      left: 22px;
       top: 0;
       bottom: 0;
       width: 1px;
-      background: rgba(206, 105, 92, 0.36);
-      pointer-events: none;
+      background: rgba(0, 0, 0, 0.1);
     }
 
     .promise-note::after {
       content: "";
       position: absolute;
-      width: 17px;
-      height: 17px;
-      left: 50%;
       top: 10px;
-      transform: translateX(-50%);
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      margin-left: -5px;
       border-radius: 50%;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.72) 0 13%, transparent 15%),
-        var(--pin-color, #ae2d25);
-      box-shadow:
-        0 2px 2px rgba(48, 24, 12, 0.45),
-        inset -2px -2px 2px rgba(74, 14, 10, 0.28);
-      pointer-events: none;
-    }
-
-    .note-text {
-      position: relative;
-      z-index: 1;
-      max-height: 147px;
-      overflow: hidden;
-      margin: 0;
-      padding-left: 10px;
-      color: var(--note-ink, #2c2c2c);
-      font-family: "Courier Prime", monospace;
-      font-size: 0.92rem;
-      line-height: 33px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      text-shadow: 0 0 0.2px currentColor;
-    }
-
-    .note-text::after {
-      content: "";
-      position: absolute;
-      inset: auto 0 0;
-      height: 36px;
-      background: linear-gradient(transparent, var(--paper-color));
-      pointer-events: none;
-    }
-
-    .note-meta {
-      position: absolute;
-      z-index: 2;
-      left: 27px;
-      right: 27px;
-      bottom: 19px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(95, 75, 53, 0.16);
-      color: rgba(76, 66, 56, 0.58);
-      font-family: "Courier Prime", monospace;
-      font-size: 0.61rem;
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .note-meta span {
-      overflow: hidden;
-      text-overflow: ellipsis;
+      background: radial-gradient(circle at 35% 30%, #8a8a8a, #3a3a3a);
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
     }
 
     .note-tape {
       position: absolute;
-      top: -11px;
-      right: 20px;
-      width: 76px;
-      height: 25px;
-      opacity: 0.78;
-      transform: rotate(5deg);
-      background:
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,0.08) 0 2px,
-          rgba(0,0,0,0.03) 2px 4px
-        ),
-        rgba(229, 209, 121, 0.76);
-      box-shadow: 0 1px 2px rgba(40, 28, 16, 0.18);
+      top: -9px;
+      right: 22px;
+      z-index: 2;
+      width: 62px;
+      height: 20px;
+      background: rgba(200, 198, 192, 0.7);
+      transform: rotate(4deg);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
     }
+
+    .note-text {
+      margin: 0;
+      max-height: 124px;
+      overflow: hidden;
+      font-size: 0.82rem;
+      line-height: 31px;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note-meta {
+      position: absolute;
+      left: 34px;
+      right: 24px;
+      bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .note-meta span { overflow: hidden; text-overflow: ellipsis; }
 
     .state-msg {
       position: absolute;
-      top: 50%;
       left: 50%;
-      width: min(430px, calc(100% - 48px));
-      transform: translate(-50%, -50%);
-      padding: 22px;
-      border: 1px solid rgba(255,255,255,0.25);
-      background: rgba(70, 40, 22, 0.48);
-      color: #fff7e9;
-      text-align: center;
-      font-family: "Courier Prime", monospace;
-      font-size: 0.82rem;
-      line-height: 1.55;
-      letter-spacing: 0.04em;
+      bottom: 22px;
+      transform: translateX(-50%);
+      margin: 0;
+      padding: 8px 16px;
+      background: rgba(253, 252, 249, 0.9);
+      border: 1px solid var(--line);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      pointer-events: none;
     }
 
-    .write-cta {
-      padding: 26px 24px 14px;
-      text-align: center;
-    }
+    .write-cta { text-align: center; padding: 30px 24px 10px; }
 
     .write-cta a {
-      color: #776b5e;
-      border-bottom: 1px solid #c8b9a7;
+      color: var(--muted);
       text-decoration: none;
-      font-family: "Courier Prime", monospace;
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
-      transition: color 0.2s ease, border-color 0.2s ease;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      transition: color 0.2s, border-color 0.2s;
     }
 
-    .write-cta a:hover {
-      color: var(--ink);
-      border-color: var(--ink);
-    }
+    .write-cta a:hover { color: var(--ink); border-color: var(--ink); }
 
     footer {
-      margin-top: 34px;
+      margin-top: 40px;
       padding: 28px 20px;
-      border-top: 1px solid #ded3c6;
-      color: #a1968a;
+      border-top: 1px solid var(--line);
       text-align: center;
-      font-family: "Courier Prime", monospace;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       letter-spacing: 0.06em;
+      color: #aaa69e;
     }
 
     .promise-modal {
@@ -425,153 +313,76 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background: rgba(30, 20, 13, 0.72);
-      backdrop-filter: blur(4px);
+      background: rgba(243, 241, 237, 0.88);
+      backdrop-filter: blur(6px);
     }
 
-    .promise-modal.open {
-      display: flex;
-    }
+    .promise-modal.open { display: flex; }
 
     .modal-note {
-      --modal-ink: #2c2c2c;
       position: relative;
-      width: min(620px, 100%);
-      max-height: min(76vh, 760px);
+      width: min(560px, 100%);
+      max-height: 78vh;
       overflow: auto;
-      padding: 66px 56px 44px 74px;
-      color: var(--modal-ink);
+      padding: 60px 48px 36px 68px;
       background:
-        linear-gradient(
-          to bottom,
-          transparent 0,
-          transparent 33px,
-          rgba(115, 152, 185, 0.18) 34px,
-          transparent 35px
-        ),
-        #fffdf7;
-      background-size: 100% 35px;
-      box-shadow: 14px 18px 40px rgba(0,0,0,0.42);
-      clip-path: polygon(
-        1% 1%, 9% 0.3%, 19% 1.5%, 29% 0.2%, 41% 1.5%,
-        53% 0.2%, 66% 1.4%, 79% 0.3%, 91% 1.6%, 99% 0.5%,
-        98.6% 15%, 100% 29%, 98.5% 43%, 99.7% 57%, 98.3% 70%,
-        99.8% 85%, 98.6% 99%, 84% 98.3%, 70% 99.5%, 55% 98.1%,
-        40% 99.4%, 25% 98.2%, 12% 99.5%, 1% 98.3%, 1.6% 83%,
-        0.2% 68%, 1.5% 53%, 0.3% 38%, 1.7% 24%, 0.4% 11%
-      );
+        linear-gradient(to bottom, transparent 0, transparent 34px, rgba(0,0,0,0.07) 35px, transparent 36px),
+        var(--paper);
+      background-size: 100% 36px;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.08), 0 24px 60px rgba(0,0,0,0.18);
     }
 
     .modal-note::before {
       content: "";
       position: absolute;
-      left: 51px;
+      left: 44px;
       top: 0;
       bottom: 0;
       width: 1px;
-      background: rgba(206, 105, 92, 0.42);
-    }
-
-    .modal-pin {
-      position: absolute;
-      top: 17px;
-      left: 50%;
-      width: 20px;
-      height: 20px;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      background: var(--modal-pin, #ae2d25);
-      box-shadow:
-        0 3px 3px rgba(48,24,12,0.45),
-        inset -2px -2px 2px rgba(74,14,10,0.28);
+      background: rgba(0, 0, 0, 0.1);
     }
 
     .modal-close {
       position: absolute;
-      z-index: 2;
-      top: 18px;
-      right: 22px;
+      top: 16px;
+      right: 20px;
       border: 0;
-      background: transparent;
-      color: #746759;
-      cursor: pointer;
-      font-family: "Courier Prime", monospace;
+      background: none;
+      color: var(--muted);
+      font-family: inherit;
       font-size: 0.72rem;
       letter-spacing: 0.06em;
+      cursor: pointer;
     }
 
-    .modal-close:hover {
-      color: var(--ink);
-    }
+    .modal-close:hover { color: var(--ink); }
 
     .modal-text {
-      position: relative;
-      z-index: 1;
       margin: 0;
-      padding-left: 9px;
-      font-family: "Courier Prime", monospace;
-      font-size: clamp(0.95rem, 2.1vw, 1.08rem);
-      line-height: 35px;
+      font-size: 1rem;
+      line-height: 36px;
       white-space: pre-wrap;
       word-break: break-word;
     }
 
     .modal-meta {
-      position: relative;
-      z-index: 1;
       display: flex;
       justify-content: space-between;
-      gap: 14px;
-      margin-top: 30px;
-      padding: 15px 0 0 9px;
-      border-top: 1px solid rgba(95, 75, 53, 0.18);
-      color: #817467;
-      font-family: "Courier Prime", monospace;
-      font-size: 0.72rem;
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 0.7rem;
       letter-spacing: 0.06em;
+      color: var(--muted);
     }
 
     @media (max-width: 700px) {
-      .wall-intro {
-        padding-top: 30px;
-      }
-
-      .wall-tools {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .board-hint {
-        display: none;
-      }
-
-      .board-viewport {
-        width: calc(100vw - 20px);
-        min-height: 560px;
-        height: 70vh;
-        border-width: 9px;
-      }
-
-      .nav-inner {
-        padding: 0 15px;
-      }
-
-      .nav-links {
-        gap: 12px;
-      }
-
-      .board-scene {
-        width: 1600px;
-        height: 1100px;
-      }
-
-      .modal-note {
-        padding: 62px 28px 34px 54px;
-      }
-
-      .modal-note::before {
-        left: 35px;
-      }
+      .wall-tools { grid-template-columns: 1fr auto; }
+      .board-hint { display: none; }
+      .board-viewport { width: calc(100vw - 20px); height: 68vh; }
+      .modal-note { padding: 56px 26px 30px 52px; }
+      .modal-note::before { left: 34px; }
     }
   </style>
 </head>
@@ -590,40 +401,31 @@
   <main class="wall-page">
     <section class="wall-intro">
       <h1>The Promise Wall</h1>
-      <p>
-        A board full of promises people made quietly to themselves.
-        Zoom out to take it all in. Move closer when one catches your eye.
-      </p>
+      <p>Promises people made quietly to themselves. Step back to see them all. Move closer to read one.</p>
     </section>
 
     <div class="wall-tools">
-      <p class="promise-count" id="promise-count">loading promises...</p>
-
-      <div class="zoom-controls" aria-label="Wall zoom controls">
+      <p class="promise-count" id="promise-count">loading...</p>
+      <div class="zoom-controls">
         <button class="zoom-btn" id="zoom-out" type="button" aria-label="Zoom out">−</button>
-        <button class="zoom-btn reset" id="zoom-reset" type="button">reset</button>
+        <button class="zoom-btn" id="zoom-reset" type="button">reset</button>
         <button class="zoom-btn" id="zoom-in" type="button" aria-label="Zoom in">+</button>
       </div>
-
-      <p class="board-hint">scroll to zoom · drag to explore · click a note to read</p>
+      <p class="board-hint">scroll to zoom · drag to move · click to read</p>
     </div>
 
-    <section class="board-viewport" id="board-viewport" aria-label="Interactive promise board">
+    <section class="board-viewport" id="board-viewport" aria-label="Promise wall">
       <div class="board-scene" id="board-scene"></div>
-      <p class="state-msg" id="state-msg">loading the promise wall...</p>
-      <span class="board-shadow-label">Promises to Self</span>
+      <p class="state-msg" id="state-msg">loading the wall...</p>
     </section>
 
-    <div class="write-cta">
-      <a href="index.html">make a promise of your own →</a>
-    </div>
+    <div class="write-cta"><a href="index.html">make a promise of your own →</a></div>
   </main>
 
   <footer>© 2026 · Promises to Self · made with patience and coffee</footer>
 
-  <div class="promise-modal" id="promise-modal" role="dialog" aria-modal="true" aria-label="Promise details">
-    <article class="modal-note" id="modal-note">
-      <span class="modal-pin" id="modal-pin"></span>
+  <div class="promise-modal" id="promise-modal" role="dialog" aria-modal="true">
+    <article class="modal-note">
       <button class="modal-close" id="modal-close" type="button">close ×</button>
       <p class="modal-text" id="modal-text"></p>
       <div class="modal-meta">
@@ -635,14 +437,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      orderBy,
-      query,
-      limit
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, orderBy, query, limit }
+      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPnZ8f4cek3JcIwfopsmxnCAGTXoH--yc",
@@ -653,287 +449,206 @@
       appId: "1:631041179526:web:7d2fea0e3a5b48ce567607"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getFirestore(initializeApp(firebaseConfig));
+
+    const MIN_SHEETS = 16;
+    const CELL_W = 330;
+    const CELL_H = 300;
+    const PAD = 110;
 
     const viewport = document.getElementById("board-viewport");
     const scene = document.getElementById("board-scene");
     const stateMsg = document.getElementById("state-msg");
     const countEl = document.getElementById("promise-count");
-
-    const zoomInBtn = document.getElementById("zoom-in");
-    const zoomOutBtn = document.getElementById("zoom-out");
-    const resetBtn = document.getElementById("zoom-reset");
-
     const modal = document.getElementById("promise-modal");
-    const modalNote = document.getElementById("modal-note");
-    const modalPin = document.getElementById("modal-pin");
-    const modalText = document.getElementById("modal-text");
-    const modalAuthor = document.getElementById("modal-author");
-    const modalDate = document.getElementById("modal-date");
-    const modalClose = document.getElementById("modal-close");
 
-    const sceneWidth = 1600;
-    const sceneHeight = 1100;
-    const colors = ["#ae2d25", "#285a93", "#2d6a4f", "#6d3fa0", "#b8751c"];
-    const paperColors = ["#fffdf7", "#fff9df", "#f7fbff", "#fff4ed", "#f8fff0"];
+    let scale = 0.6, tx = 0, ty = 0;
+    let sceneW = 1000, sceneH = 640;
+    let dragging = false, moved = false;
+    let startX = 0, startY = 0, startTx = 0, startTy = 0;
 
-    let scale = 0.48;
-    let translateX = 0;
-    let translateY = 0;
-    let isDragging = false;
-    let moved = false;
-    let pointerStartX = 0;
-    let pointerStartY = 0;
-    let translateStartX = 0;
-    let translateStartY = 0;
-    let promises = [];
+    const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
 
-    function escapeHtml(value) {
-      return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function formatDate(timestamp) {
-      if (!timestamp || !timestamp.toDate) return "just now";
-      return timestamp.toDate().toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric"
-      });
-    }
-
-    function hashString(value) {
-      let hash = 0;
-      const text = String(value || "");
-      for (let i = 0; i < text.length; i++) {
-        hash = ((hash << 5) - hash) + text.charCodeAt(i);
-        hash |= 0;
-      }
-      return Math.abs(hash);
-    }
-
-    function randomFromSeed(seed) {
-      const x = Math.sin(seed * 999) * 10000;
+    function rand(seed) {
+      const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
       return x - Math.floor(x);
     }
 
-    function clamp(value, min, max) {
-      return Math.min(Math.max(value, min), max);
+    function hash(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
+      return Math.abs(h);
     }
 
-    function updateScene() {
+    function esc(v) {
+      return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function fmt(ts) {
+      return ts && ts.toDate
+        ? ts.toDate().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+        : "";
+    }
+
+    function applyTransform() {
       scene.style.transform =
-        `translate(calc(-50% + ${translateX}px), calc(-50% + ${translateY}px)) scale(${scale})`;
+        `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scale})`;
     }
 
-    function fitBoard() {
-      const rect = viewport.getBoundingClientRect();
-      scale = Math.min((rect.width - 55) / sceneWidth, (rect.height - 55) / sceneHeight);
-      scale = clamp(scale, 0.28, 0.62);
-      translateX = 0;
-      translateY = 0;
-      updateScene();
+    function fit() {
+      const r = viewport.getBoundingClientRect();
+      scale = clamp(Math.min(r.width / sceneW, r.height / sceneH) * 0.96, 0.25, 1);
+      tx = 0; ty = 0;
+      applyTransform();
     }
 
-    function changeZoom(delta, focalX, focalY) {
-      const previousScale = scale;
-      scale = clamp(scale + delta, 0.28, 1.7);
-
-      if (focalX !== undefined && focalY !== undefined) {
-        const rect = viewport.getBoundingClientRect();
-        const offsetX = focalX - rect.left - rect.width / 2;
-        const offsetY = focalY - rect.top - rect.height / 2;
-        const ratio = scale / previousScale;
-
-        translateX = offsetX - (offsetX - translateX) * ratio;
-        translateY = offsetY - (offsetY - translateY) * ratio;
+    function zoomBy(delta, cx, cy) {
+      const prev = scale;
+      scale = clamp(scale + delta, 0.2, 2);
+      if (cx !== undefined) {
+        const r = viewport.getBoundingClientRect();
+        const ox = cx - r.left - r.width / 2;
+        const oy = cy - r.top - r.height / 2;
+        const k = scale / prev;
+        tx = ox - (ox - tx) * k;
+        ty = oy - (oy - ty) * k;
       }
-
-      updateScene();
+      applyTransform();
     }
 
-    function openPromise(promise) {
-      modalNote.style.setProperty("--modal-ink", promise.inkColor || "#2c2c2c");
-      modalPin.style.setProperty("--modal-pin", promise.pinColor || "#ae2d25");
-      modalText.textContent = promise.text;
-      modalAuthor.textContent = promise.author || "anonymous";
-      modalDate.textContent = formatDate(promise.createdAt);
+    function openNote(p) {
+      document.getElementById("modal-text").textContent = p.text || "";
+      document.getElementById("modal-author").textContent = p.author || "anonymous";
+      document.getElementById("modal-date").textContent = fmt(p.createdAt);
       modal.classList.add("open");
       document.body.style.overflow = "hidden";
     }
 
-    function closePromise() {
+    function closeNote() {
       modal.classList.remove("open");
       document.body.style.overflow = "";
     }
 
-    function createNote(promise, index) {
-      const seed = hashString(`${promise.id}-${index}-${promise.text}`);
-      const note = document.createElement("article");
+    function buildBoard(promises) {
+      const total = Math.max(promises.length, MIN_SHEETS);
+      const cols = Math.max(3, Math.ceil(Math.sqrt(total * 1.6)));
+      const rows = Math.ceil(total / cols);
 
-      const noteWidth = 260 + Math.round(randomFromSeed(seed + 1) * 70);
-      const noteHeight = 215 + Math.round(randomFromSeed(seed + 2) * 90);
-      const x = 55 + Math.round(randomFromSeed(seed + 3) * (sceneWidth - noteWidth - 110));
-      const y = 45 + Math.round(randomFromSeed(seed + 4) * (sceneHeight - noteHeight - 90));
-      const rotation = -7 + randomFromSeed(seed + 5) * 14;
-      const zIndex = 5 + index;
-
-      promise.pinColor = colors[Math.floor(randomFromSeed(seed + 6) * colors.length)];
-
-      note.className = "promise-note";
-      note.tabIndex = 0;
-      note.setAttribute("role", "button");
-      note.setAttribute("aria-label", `Read promise by ${promise.author || "anonymous"}`);
-      note.style.width = `${noteWidth}px`;
-      note.style.minHeight = `${noteHeight}px`;
-      note.style.left = `${x}px`;
-      note.style.top = `${y}px`;
-      note.style.zIndex = zIndex;
-      note.style.setProperty("--rotation", `${rotation.toFixed(1)}deg`);
-      note.style.setProperty("--paper-color", paperColors[Math.floor(randomFromSeed(seed + 7) * paperColors.length)]);
-      note.style.setProperty("--note-ink", promise.inkColor || "#2c2c2c");
-      note.style.setProperty("--pin-color", promise.pinColor);
-
-      const tape = randomFromSeed(seed + 8) > 0.54
-        ? '<span class="note-tape" aria-hidden="true"></span>'
-        : "";
-
-      note.innerHTML = `
-        ${tape}
-        <p class="note-text">${escapeHtml(promise.text)}</p>
-        <div class="note-meta">
-          <span>${escapeHtml(promise.author || "anonymous")}</span>
-          <span>${formatDate(promise.createdAt)}</span>
-        </div>
-      `;
-
-      note.addEventListener("click", event => {
-        if (moved) return;
-        event.stopPropagation();
-        openPromise(promise);
-      });
-
-      note.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          openPromise(promise);
-        }
-      });
-
-      return note;
-    }
-
-    function renderBoard() {
+      sceneW = Math.max(1000, cols * CELL_W + PAD * 2);
+      sceneH = Math.max(640, rows * CELL_H + PAD * 2);
+      scene.style.width = sceneW + "px";
+      scene.style.height = sceneH + "px";
       scene.innerHTML = "";
 
-      promises.forEach((promise, index) => {
-        scene.appendChild(createNote(promise, index));
+      const slots = Array.from({ length: total }, (_, i) => i)
+        .map(i => ({ i, r: rand(i + 7) }))
+        .sort((a, b) => a.r - b.r)
+        .map(o => o.i);
+
+      const offsetX = (sceneW - cols * CELL_W) / 2;
+      const offsetY = (sceneH - rows * CELL_H) / 2;
+
+      slots.forEach((slot, order) => {
+        const col = slot % cols;
+        const row = Math.floor(slot / cols);
+        const promise = promises[order];
+        const seed = hash(promise ? promise.id : "blank" + slot) + slot;
+
+        const w = 220 + Math.round(rand(seed + 1) * 40);
+        const h = 200 + Math.round(rand(seed + 2) * 40);
+        const x = offsetX + col * CELL_W + (CELL_W - w) / 2 + (rand(seed + 3) - 0.5) * 50;
+        const y = offsetY + row * CELL_H + (CELL_H - h) / 2 + (rand(seed + 4) - 0.5) * 40;
+        const rot = (rand(seed + 5) - 0.5) * 10;
+
+        const el = document.createElement("article");
+        el.style.cssText =
+          `width:${w}px;height:${h}px;left:${x}px;top:${y}px;--rot:${rot.toFixed(1)}deg;z-index:${order + 1}`;
+
+        if (!promise) {
+          el.className = "blank-sheet";
+        } else {
+          el.className = "promise-note";
+          el.tabIndex = 0;
+          el.setAttribute("role", "button");
+          el.innerHTML = `
+            ${rand(seed + 6) > 0.55 ? '<span class="note-tape"></span>' : ""}
+            <p class="note-text">${esc(promise.text)}</p>
+            <div class="note-meta">
+              <span>${esc(promise.author || "anonymous")}</span>
+              <span>${fmt(promise.createdAt)}</span>
+            </div>`;
+          el.addEventListener("click", () => { if (!moved) openNote(promise); });
+          el.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openNote(promise); }
+          });
+        }
+        scene.appendChild(el);
       });
 
-      countEl.textContent =
-        `${promises.length} promise${promises.length === 1 ? "" : "s"} pinned to the board`;
-
-      fitBoard();
+      fit();
     }
 
-    async function loadWall() {
+    async function load() {
       try {
-        const q = query(
-          collection(db, "submissions"),
-          orderBy("createdAt", "desc"),
-          limit(120)
-        );
+        const q = query(collection(db, "submissions"), orderBy("createdAt", "desc"), limit(150));
+        const snap = await getDocs(q);
+        const promises = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        const snapshot = await getDocs(q);
+        buildBoard(promises);
+        countEl.textContent = `${promises.length} promise${promises.length === 1 ? "" : "s"} on the wall`;
 
-        if (snapshot.empty) {
-          stateMsg.textContent = "The board is waiting for its first promise.";
-          countEl.textContent = "0 promises pinned to the board";
-          return;
+        if (promises.length) {
+          stateMsg.remove();
+        } else {
+          stateMsg.textContent = "the wall is waiting for its first promise";
         }
-
-        promises = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-
-        stateMsg.remove();
-        renderBoard();
-      } catch (error) {
-        console.error("Could not load promise wall:", error);
-        stateMsg.textContent = "Could not load the wall. Please try again later.";
+      } catch (err) {
+        console.error(err);
+        buildBoard([]);
+        stateMsg.textContent = "could not load the wall. try again later.";
         countEl.textContent = "";
       }
     }
 
-    viewport.addEventListener("wheel", event => {
-      event.preventDefault();
-      const direction = event.deltaY < 0 ? 0.08 : -0.08;
-      changeZoom(direction, event.clientX, event.clientY);
+    viewport.addEventListener("wheel", e => {
+      e.preventDefault();
+      zoomBy(e.deltaY < 0 ? 0.08 : -0.08, e.clientX, e.clientY);
     }, { passive: false });
 
-    viewport.addEventListener("pointerdown", event => {
-      if (event.target.closest(".promise-note")) return;
-
-      isDragging = true;
+    viewport.addEventListener("pointerdown", e => {
+      dragging = true;
       moved = false;
-      pointerStartX = event.clientX;
-      pointerStartY = event.clientY;
-      translateStartX = translateX;
-      translateStartY = translateY;
+      startX = e.clientX; startY = e.clientY;
+      startTx = tx; startTy = ty;
       viewport.classList.add("dragging");
-      viewport.setPointerCapture(event.pointerId);
     });
 
-    viewport.addEventListener("pointermove", event => {
-      if (!isDragging) return;
-
-      const dx = event.clientX - pointerStartX;
-      const dy = event.clientY - pointerStartY;
-
-      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
-
-      translateX = translateStartX + dx;
-      translateY = translateStartY + dy;
-      updateScene();
+    window.addEventListener("pointermove", e => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+      if (moved) { tx = startTx + dx; ty = startTy + dy; applyTransform(); }
     });
 
-    function stopDrag(event) {
-      if (!isDragging) return;
-      isDragging = false;
+    window.addEventListener("pointerup", () => {
+      if (!dragging) return;
+      dragging = false;
       viewport.classList.remove("dragging");
-
-      if (viewport.hasPointerCapture(event.pointerId)) {
-        viewport.releasePointerCapture(event.pointerId);
-      }
-
       setTimeout(() => { moved = false; }, 0);
-    }
-
-    viewport.addEventListener("pointerup", stopDrag);
-    viewport.addEventListener("pointercancel", stopDrag);
-
-    zoomInBtn.addEventListener("click", () => changeZoom(0.14));
-    zoomOutBtn.addEventListener("click", () => changeZoom(-0.14));
-    resetBtn.addEventListener("click", fitBoard);
-    window.addEventListener("resize", fitBoard);
-
-    modalClose.addEventListener("click", closePromise);
-
-    modal.addEventListener("click", event => {
-      if (event.target === modal) closePromise();
     });
 
-    window.addEventListener("keydown", event => {
-      if (event.key === "Escape") closePromise();
-    });
+    document.getElementById("zoom-in").addEventListener("click", () => zoomBy(0.15));
+    document.getElementById("zoom-out").addEventListener("click", () => zoomBy(-0.15));
+    document.getElementById("zoom-reset").addEventListener("click", fit);
+    window.addEventListener("resize", fit);
 
-    loadWall();
+    document.getElementById("modal-close").addEventListener("click", closeNote);
+    modal.addEventListener("click", e => { if (e.target === modal) closeNote(); });
+    window.addEventListener("keydown", e => { if (e.key === "Escape") closeNote(); });
+
+    load();
   </script>
 </body>
 </html>
